@@ -1,0 +1,433 @@
+openapi: 3.0.2
+info:
+  title: Flyme API
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/
+
+tags:
+  - name: User
+    description: User関連API
+  - name: Follow
+    description: 友達API
+  - name: History
+    description: 移動履歴API
+
+paths:
+  /ping:
+    get:
+      summary: 死活管理用
+      responses:
+        200:
+          description: alive
+          content:
+            "text/plain":
+              schema:
+                type: string
+                example: pong
+
+  /user:
+    post:
+      tags:
+        - User
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/NewUser"
+      summary: Userの登録
+      responses:
+        200:
+          description: User情報を返却
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/User"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /login:
+    post:
+      tags:
+        - User
+      summary: ログイン
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/Login"
+      responses:
+        200:
+          description: User情報
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Token"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /user/{userID}:
+    get:
+      tags:
+        - User
+      summary: User情報の取得
+      parameters:
+        - $ref: "#/components/parameters/userID"
+      responses:
+        200:
+          description: User情報を返却
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/User"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      tags:
+        - User
+      parameters:
+        - $ref: "#/components/parameters/userID"
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/User"
+      summary: User情報の更新
+      responses:
+        200:
+          description: User情報
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/User"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags:
+        - User
+      summary: Userの更新
+      parameters:
+        - $ref: "#/components/parameters/userID"
+      responses:
+        200:
+          description: User情報
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/User"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /follow/{userID}:
+    get:
+      tags:
+        - Follow
+      summary: フォロワーリスト
+      parameters:
+        - $ref: "#/components/parameters/userID"
+      responses:
+        200:
+          description: フォロワーのリスト
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Friends"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      tags:
+        - Follow
+      summary: フォロー申請する
+      responses:
+        200:
+          description: フォロワーのリスト
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/User"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+  /request/{userID}:
+    get:
+      tags:
+        - Follow
+      summary: フォロー申請されている人のリスト
+      parameters:
+        - $ref: "#/components/parameters/userID"
+      responses:
+        200:
+          description: フォロワーのリスト
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Requests"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      tags:
+        - Follow
+      summary: フォロー申請を許可
+      responses:
+        200:
+          description: フォローリスト
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/User"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /history/{userID}:
+    post:
+      tags:
+        - History
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/History"
+      summary: 移動履歴の登録
+      responses:
+        200:
+          description: 移動履歴を返却
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/History"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+    get:
+      tags:
+        - History
+      summary: 移動履歴を新しい順で取得
+      parameters:
+        - $ref: "#/components/parameters/userID"
+        - $ref: "#/components/parameters/number"
+      responses:
+        200:
+          description: 移動履歴を返却
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Histories"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+    NewUser:
+      type: object
+      properties:
+        userID:
+          type: string
+          example: fun
+        userName:
+          type: string
+          example: 公立はこだて未来大学
+        passwd:
+          type: string
+          example: string
+    User:
+      type: object
+      properties:
+        userID:
+          type: string
+          example: fun
+        userName:
+          type: string
+          example: 公立はこだて未来大学
+        icon:
+          type: string
+    History:
+      type: object
+      properties:
+        dist:
+          type: number
+          format: float
+          example: 33.4
+        hour:
+          type: string
+          example: 3:34
+        coordinates:
+          type: array
+          items:
+            type: object
+            properties:
+              lat:
+                type: number
+                format: float
+                example: 41.841806
+              lng:
+                type: number
+                format: float
+                example: 140.766944
+
+    Histories:
+      type: object
+      properties:
+        histories:
+          type: array
+          items:
+            $ref: "#/components/schemas/History"
+
+    Friends:
+      type: object
+      properties:
+        friends:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+    Requests:
+      type: object
+      properties:
+        requests:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+    Login:
+      type: object
+      properties:
+        userID:
+          type: string
+          example: fun
+        passwd:
+          type: string
+    Token:
+      type: object
+      properties:
+        token:
+          type: string
+
+  parameters:
+    userID:
+      name: userID
+      in: path
+      required: true
+      description: userID
+      schema:
+        type: string
+    number:
+      name: number
+      in: query
+      required: true
+      description: 取得件数 (1~10)
+      schema:
+        type: integer
