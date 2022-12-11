@@ -1,4 +1,4 @@
-module github.com/fung-hackathon/flyme-backend
+module flyme-backend
 
 go 1.19
 

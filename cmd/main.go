@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/fung-hackathon/flyme-backend/app/interface/server"
+	server "flyme-backend/app/interfaces"
 )
 
 func main() {
 	s := server.NewServer()
 
-	s.Start()
+	s.StartServer()
 }

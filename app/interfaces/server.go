@@ -1,4 +1,4 @@
-package server
+package interfaces
 
 import (
 	"net/http"
@@ -14,7 +14,7 @@ func NewServer() *Server {
 	return &Server{echo.New()}
 }
 
-func (s *Server) Start() {
+func (s *Server) StartServer() {
 	s.Router.GET("/ping", func(c echo.Context) error {
 		return c.String(http.StatusOK, "pong")
 	})
