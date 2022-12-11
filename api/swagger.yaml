@@ -9,6 +9,8 @@ servers:
 tags:
   - name: User
     description: User関連API
+  - name: History
+    description: 移動履歴API
 
 paths:
   /ping:
@@ -134,6 +136,61 @@ paths:
             "application/json":
               schema:
                 $ref: "#/components/schemas/Error"
+  /history/{userID}:
+    post:
+      tags:
+        - History
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/History"
+      summary: 移動履歴の登録
+      responses:
+        200:
+          description: 移動履歴を返却
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/History"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+    get:
+      tags:
+        - History
+      summary: 移動履歴を新しい順で取得
+      parameters:
+        - $ref: "#/components/parameters/userID"
+        - $ref: "#/components/parameters/number"
+      responses:
+        200:
+          description: 移動履歴を返却
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Histories"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
 
 components:
   schemas:
@@ -167,6 +224,37 @@ components:
           example: 公立はこだて未来大学
         icon:
           type: string
+    History:
+      type: object
+      properties:
+        dist:
+          type: number
+          format: float
+          example: 33.4
+        hour:
+          type: string
+          example: 3:34
+        coordinates:
+          type: array
+          items:
+            type: object
+            properties:
+              lat:
+                type: number
+                format: float
+                example: 41.841806
+              lng:
+                type: number
+                format: float
+                example: 140.766944
+
+    Histories:
+      type: object
+      properties:
+        histories:
+          type: array
+          items:
+            $ref: "#/components/schemas/History"
   parameters:
     userID:
       name: userID
@@ -175,3 +263,10 @@ components:
       description: userID
       schema:
         type: string
+    number:
+      name: number
+      in: query
+      required: true
+      description: 取得件数 (1~10)
+      schema:
+        type: integer
