@@ -57,6 +57,36 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /login:
+    post:
+      tags:
+        - User
+      summary: ログイン
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/Login"
+      responses:
+        200:
+          description: User情報
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Token"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /user/{userID}:
     get:
       tags:
@@ -372,6 +402,19 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/User"
+    Login:
+      type: object
+      properties:
+        userID:
+          type: string
+          example: fun
+        passwd:
+          type: string
+    Token:
+      type: object
+      properties:
+        token:
+          type: string
 
   parameters:
     userID:
