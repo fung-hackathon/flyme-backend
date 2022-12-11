@@ -1,0 +1,177 @@
+openapi: 3.0.2
+info:
+  title: Flyme API
+  version: 1.0.0
+
+servers:
+  - url: localhost:8080
+
+tags:
+  - name: User
+    description: User関連API
+
+paths:
+  /ping:
+    get:
+      summary: 死活管理用
+      responses:
+        200:
+          description: alive
+          content:
+            "text/plain":
+              schema:
+                type: string
+                example: pong
+
+  /user:
+    post:
+      tags:
+        - User
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/NewUser"
+      summary: Userの登録
+      responses:
+        200:
+          description: User情報を返却
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/User"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /user/{userID}:
+    get:
+      tags:
+        - User
+      summary: User情報の取得
+      parameters:
+        - $ref: "#/components/parameters/userID"
+      responses:
+        200:
+          description: User情報を返却
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/User"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      tags:
+        - User
+      parameters:
+        - $ref: "#/components/parameters/userID"
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/User"
+      summary: User情報の更新
+      responses:
+        200:
+          description: User情報
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/User"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags:
+        - User
+      summary: Userの更新
+      parameters:
+        - $ref: "#/components/parameters/userID"
+      responses:
+        200:
+          description: ユーザのuuid
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/User"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+    NewUser:
+      type: object
+      properties:
+        userID:
+          type: string
+          example: fun
+        userName:
+          type: string
+          example: 公立はこだて未来大学
+        passwd:
+          type: string
+          example: string
+    User:
+      type: object
+      properties:
+        userID:
+          type: string
+          example: fun
+        userName:
+          type: string
+          example: 公立はこだて未来大学
+        icon:
+          type: string
+  parameters:
+    userID:
+      name: userID
+      in: path
+      required: true
+      description: userID
+      schema:
+        type: string
