@@ -2,9 +2,9 @@ module github.com/fung-hackathon/flyme-backend
 
 go 1.19
 
+require github.com/labstack/echo/v4 v4.9.1
+
 require (
-	github.com/labstack/echo v3.3.10+incompatible // indirect
-	github.com/labstack/echo/v4 v4.9.1 // indirect
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
