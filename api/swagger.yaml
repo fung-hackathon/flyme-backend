@@ -121,7 +121,7 @@ paths:
         - $ref: "#/components/parameters/userID"
       responses:
         200:
-          description: ユーザのuuid
+          description: User情報
           content:
             "application/json":
               schema:
