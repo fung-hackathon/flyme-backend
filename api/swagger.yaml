@@ -9,6 +9,8 @@ servers:
 tags:
   - name: User
     description: User関連API
+  - name: Follow
+    description: 友達API
   - name: History
     description: 移動履歴API
 
@@ -136,6 +138,106 @@ paths:
             "application/json":
               schema:
                 $ref: "#/components/schemas/Error"
+
+  /follow/{userID}:
+    get:
+      tags:
+        - Follow
+      summary: フォロワーリスト
+      parameters:
+        - $ref: "#/components/parameters/userID"
+      responses:
+        200:
+          description: フォロワーのリスト
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Friends"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      tags:
+        - Follow
+      summary: フォロー申請する
+      responses:
+        200:
+          description: フォロワーのリスト
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/User"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+  /request/{userID}:
+    get:
+      tags:
+        - Follow
+      summary: フォロー申請されている人のリスト
+      parameters:
+        - $ref: "#/components/parameters/userID"
+      responses:
+        200:
+          description: フォロワーのリスト
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Requests"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      tags:
+        - Follow
+      summary: フォロー申請を許可
+      responses:
+        200:
+          description: フォローリスト
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/User"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /history/{userID}:
     post:
       tags:
@@ -255,6 +357,22 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/History"
+
+    Friends:
+      type: object
+      properties:
+        friends:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+    Requests:
+      type: object
+      properties:
+        requests:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+
   parameters:
     userID:
       name: userID
