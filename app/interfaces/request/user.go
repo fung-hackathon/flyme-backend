@@ -1,12 +1,12 @@
-package response
+package request
 
-type ReadUserResponse struct {
+type CreateUserRequest struct {
 	UserID   string `json:"userID"`
 	UserName string `json:"userName"`
-	Icon     string `json:"icon"`
+	Passwd   string `json:"passwd"`
 }
 
-type CreateUserResponse struct {
+type PutUserRequest struct {
 	UserID   string `json:"userID"`
 	UserName string `json:"userName"`
 	Icon     string `json:"icon"`

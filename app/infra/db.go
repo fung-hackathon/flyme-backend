@@ -2,7 +2,6 @@ package infra
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"flyme-backend/app/config"
 	"flyme-backend/app/domain/entity"
@@ -50,17 +49,30 @@ func (r *DBRepository) GetUser(userID string) (*entity.GetUser, error) {
 		return nil, err
 	}
 
-	jsonStr, err := json.Marshal(dsnap.Data())
+	var user entity.GetUser
+	err = entity.BindToJsonStruct(dsnap.Data(), &user)
 	if err != nil {
 		return nil, err
 	}
 
-	user := new(entity.GetUser)
+	return &user, nil
+}
 
-	err = json.Unmarshal(jsonStr, &user)
+func (r *DBRepository) InsertUser(user *entity.InsertUser) error {
+
+	data, err := entity.BindToJsonMap(user)
 	if err != nil {
-		return nil, err
+		return err
 	}
+	_, err = r.Client.Collection("users").Doc(user.UserID).Set(r.Context, data)
+	return err
+}
 
-	return user, nil
+func (r *DBRepository) PutUser(user *entity.PutUser) error {
+	info := []firestore.Update{{
+		Path:  "*",
+		Value: user,
+	}}
+	_, err := r.Client.Collection("users").Doc(user.UserID).Update(r.Context, info)
+	return err
 }
