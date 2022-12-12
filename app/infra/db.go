@@ -50,7 +50,7 @@ func (r *DBRepository) GetUser(userID string) (*entity.GetUser, error) {
 	}
 
 	var user entity.GetUser
-	err = entity.BindToJson(dsnap.Data(), &user)
+	err = entity.BindToJsonStruct(dsnap.Data(), &user)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,12 @@ func (r *DBRepository) GetUser(userID string) (*entity.GetUser, error) {
 }
 
 func (r *DBRepository) InsertUser(user *entity.InsertUser) error {
-	_, err := r.Client.Collection("users").Doc(user.UserID).Set(r.Context, user)
+
+	data, err := entity.BindToJsonMap(user)
+	if err != nil {
+		return err
+	}
+	_, err = r.Client.Collection("users").Doc(user.UserID).Set(r.Context, data)
 	return err
 }
 

@@ -34,10 +34,14 @@ func (u *UserUseCase) ReadUser(userID string) (*response.ReadUserResponse, error
 }
 
 func (u *UserUseCase) CreateUser(req *request.CreateUserRequest) (*response.CreateUserResponse, error) {
+
+	// TODO: Default Icon
+
 	query := &entity.InsertUser{
 		UserID:   req.UserID,
 		UserName: req.UserName,
-		Icon:     req.Icon,
+		Passwd:   req.Passwd,
+		Icon:     "",
 	}
 
 	err := u.dbRepository.InsertUser(query)
@@ -46,9 +50,9 @@ func (u *UserUseCase) CreateUser(req *request.CreateUserRequest) (*response.Crea
 	}
 
 	res := &response.CreateUserResponse{
-		UserID:   req.UserID,
-		UserName: req.UserName,
-		Icon:     req.Icon,
+		UserID:   query.UserID,
+		UserName: query.UserName,
+		Icon:     query.Icon,
 	}
 
 	return res, nil
