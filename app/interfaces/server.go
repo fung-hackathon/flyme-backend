@@ -4,6 +4,7 @@ import (
 	"flyme-backend/app/config"
 	"flyme-backend/app/infra"
 	"flyme-backend/app/interfaces/handler"
+	"flyme-backend/app/logger"
 	"flyme-backend/app/usecase"
 	"net/http"
 
@@ -19,10 +20,14 @@ func NewServer() *Server {
 }
 
 func (s *Server) StartServer() {
+	s.Router.Use(logger.EchoLogger())
 
 	dbRepository, err := infra.NewDBRepository()
 	if err != nil {
-		s.Router.Logger.Error(err)
+		logger.Log{
+			Message: "cannot establish DB repository",
+			Cause:   err,
+		}.Err()
 		return
 	}
 
@@ -36,6 +41,10 @@ func (s *Server) StartServer() {
 	s.Router.GET("/user/:user_id", userHandler.ReadUser)
 	s.Router.POST("/user", userHandler.CreateUser)
 
-	s.Router.Logger.Fatal(s.Router.Start(":" + config.PORT))
+	if config.MODE == config.Production {
+		s.Router.HideBanner = true
+		s.Router.HidePort = true
+	}
 
+	s.Router.Start(":" + config.PORT)
 }
