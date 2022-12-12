@@ -1,6 +1,12 @@
 package response
 
-type UserResponse struct {
+type ReadUserResponse struct {
+	UserID   string `json:"userID"`
+	UserName string `json:"userName"`
+	Icon     string `json:"icon"`
+}
+
+type CreateUserResponse struct {
 	UserID   string `json:"userID"`
 	UserName string `json:"userName"`
 	Icon     string `json:"icon"`

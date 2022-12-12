@@ -34,6 +34,7 @@ func (s *Server) StartServer() {
 	})
 
 	s.Router.GET("/user/:user_id", userHandler.ReadUser)
+	s.Router.POST("/user", userHandler.CreateUser)
 
 	s.Router.Logger.Fatal(s.Router.Start(":" + config.PORT))
 
