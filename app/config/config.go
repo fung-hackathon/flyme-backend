@@ -24,30 +24,30 @@ var (
 func init() {
 	var err error
 
-	PORT, err = GetPORT()
+	PORT, err = getPORT()
 	if err != nil {
 		panic(err)
 	}
 
-	PROJECT_ID, err = GetPROJECT_ID()
+	PROJECT_ID, err = getPROJECT_ID()
 	if err != nil {
 		panic(err)
 
 	}
 
-	GOOGLE_APPLICATION_CREDENTIALS, err = GetGOOGLE_APPLICATION_CREDENTIALS()
+	GOOGLE_APPLICATION_CREDENTIALS, err = getGOOGLE_APPLICATION_CREDENTIALS()
 	if err != nil {
 		panic(err)
 	}
 
-	MODE, err = GetMODE()
+	MODE, err = getMODE()
 	if err != nil {
 		panic(err)
 
 	}
 }
 
-func GetPORT() (string, error) {
+func getPORT() (string, error) {
 	key := "PORT"
 	e := os.Getenv(key)
 	if e == "" {
@@ -56,7 +56,7 @@ func GetPORT() (string, error) {
 	return e, nil
 }
 
-func GetPROJECT_ID() (string, error) {
+func getPROJECT_ID() (string, error) {
 	key := "PROJECT_ID"
 	e := os.Getenv(key)
 	if e == "" {
@@ -65,7 +65,7 @@ func GetPROJECT_ID() (string, error) {
 	return e, nil
 }
 
-func GetGOOGLE_APPLICATION_CREDENTIALS() (string, error) {
+func getGOOGLE_APPLICATION_CREDENTIALS() (string, error) {
 	key := "GOOGLE_APPLICATION_CREDENTIALS"
 	e := os.Getenv(key)
 	if e == "" {
@@ -74,7 +74,7 @@ func GetGOOGLE_APPLICATION_CREDENTIALS() (string, error) {
 	return e, nil
 }
 
-func GetMODE() (Mode, error) {
+func getMODE() (Mode, error) {
 	var m Mode
 	if s := os.Getenv("MODE"); s == "production" {
 		m = Production
