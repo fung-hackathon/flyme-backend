@@ -57,3 +57,25 @@ func (u *UserUseCase) CreateUser(req *request.CreateUserRequest) (*response.Crea
 
 	return res, nil
 }
+
+func (u *UserUseCase) UpdateUser(userID string, req *request.UpdateUserRequest) (*response.UpdateUserResponse, error) {
+
+	query := &entity.PutUser{
+		UserID:   userID,
+		UserName: req.UserName,
+		Icon:     req.Icon,
+	}
+
+	err := u.dbRepository.PutUser(query)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &response.UpdateUserResponse{
+		UserID:   query.UserID,
+		UserName: query.UserName,
+		Icon:     query.Icon,
+	}
+
+	return res, nil
+}

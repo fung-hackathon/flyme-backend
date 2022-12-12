@@ -6,8 +6,7 @@ type CreateUserRequest struct {
 	Passwd   string `json:"passwd"`
 }
 
-type PutUserRequest struct {
-	UserID   string `json:"userID"`
+type UpdateUserRequest struct {
 	UserName string `json:"userName"`
 	Icon     string `json:"icon"`
 }

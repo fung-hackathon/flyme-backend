@@ -75,3 +75,39 @@ func (h *UserHandler) CreateUser(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, response)
 }
+
+func (h *UserHandler) UpdateUser(c echo.Context) error {
+
+	userID := c.Param("user_id")
+
+	var req request.UpdateUserRequest
+
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(
+			http.StatusBadRequest,
+			response.Error{
+				Code:    http.StatusBadRequest,
+				Message: err.Error(),
+			},
+		)
+	}
+
+	user, err := h.userUseCase.UpdateUser(userID, &req)
+	if err != nil {
+		return c.JSON(
+			http.StatusNotFound,
+			response.Error{
+				Code:    http.StatusNotFound,
+				Message: err.Error(),
+			},
+		)
+	}
+
+	response := &response.ReadUserResponse{
+		UserID:   user.UserID,
+		UserName: user.UserName,
+		Icon:     user.Icon,
+	}
+
+	return c.JSON(http.StatusOK, response)
+}

@@ -11,3 +11,9 @@ type CreateUserResponse struct {
 	UserName string `json:"userName"`
 	Icon     string `json:"icon"`
 }
+
+type UpdateUserResponse struct {
+	UserID   string `json:"userID"`
+	UserName string `json:"userName"`
+	Icon     string `json:"icon"`
+}
