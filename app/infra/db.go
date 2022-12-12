@@ -44,7 +44,7 @@ func (r *DBRepository) Close() {
 	r.Client.Close()
 }
 
-func (r *DBRepository) GetUser(userID string) (*entity.User, error) {
+func (r *DBRepository) GetUser(userID string) (*entity.GetUser, error) {
 	dsnap, err := r.Client.Collection("users").Doc(userID).Get(r.Context)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func (r *DBRepository) GetUser(userID string) (*entity.User, error) {
 		return nil, err
 	}
 
-	user := new(entity.User)
+	user := new(entity.GetUser)
 
 	err = json.Unmarshal(jsonStr, &user)
 	if err != nil {

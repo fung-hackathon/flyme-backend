@@ -6,10 +6,10 @@ import (
 )
 
 type UserUseCase struct {
-	dbRepository repository.IDBRepository
+	dbRepository repository.DBRepositoryImpl
 }
 
-func NewUseCase(r repository.IDBRepository) *UserUseCase {
+func NewUseCase(r repository.DBRepositoryImpl) *UserUseCase {
 	return &UserUseCase{
 		dbRepository: r,
 	}
