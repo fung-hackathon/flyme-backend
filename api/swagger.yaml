@@ -122,7 +122,7 @@ paths:
         content:
           "application/json":
             schema:
-              $ref: "#/components/schemas/User"
+              $ref: "#/components/schemas/UpdateUser"
       summary: User情報の更新
       responses:
         200:
@@ -345,6 +345,14 @@ components:
         passwd:
           type: string
           example: string
+    UpdateUser:
+      type: object
+      properties:
+        userName:
+          type: string
+          example: 公立はこだて未来大学
+        icon:
+          type: string
     User:
       type: object
       properties:

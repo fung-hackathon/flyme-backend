@@ -9,11 +9,15 @@ import (
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go/v4"
 	"google.golang.org/api/option"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var (
 	ErrFirebaseInitializaition = errors.New("failed to initialize Firebase")
 	ErrFirestoreConnection     = errors.New("failed to establish connection to Firestore")
+	ErrUserDataNotFound        = errors.New("user data not found")
+	ErrUserDataAlreadyExists   = errors.New("user data already exists")
 )
 
 type DBRepository struct {
@@ -43,14 +47,36 @@ func (r *DBRepository) Close() {
 	r.Client.Close()
 }
 
+func (r *DBRepository) checkIfDataExists(doc *firestore.DocumentRef) (bool, error) {
+	_, err := doc.Get(r.Context)
+	if err == nil {
+		return true, nil
+	} else if status.Code(err) == codes.NotFound {
+		return false, nil
+	} else {
+		return false, err
+	}
+}
+
 func (r *DBRepository) GetUser(userID string) (*entity.GetUser, error) {
-	dsnap, err := r.Client.Collection("users").Doc(userID).Get(r.Context)
+
+	doc := r.Client.Collection("users").Doc(userID)
+
+	exist, err := r.checkIfDataExists(doc)
+	if err != nil {
+		return nil, err
+	}
+	if !exist {
+		return nil, ErrUserDataNotFound
+	}
+
+	docSnap, err := doc.Get(r.Context)
 	if err != nil {
 		return nil, err
 	}
 
 	var user entity.GetUser
-	err = entity.BindToJsonStruct(dsnap.Data(), &user)
+	err = entity.BindToJsonStruct(docSnap.Data(), &user)
 	if err != nil {
 		return nil, err
 	}
@@ -59,20 +85,42 @@ func (r *DBRepository) GetUser(userID string) (*entity.GetUser, error) {
 }
 
 func (r *DBRepository) InsertUser(user *entity.InsertUser) error {
-
 	data, err := entity.BindToJsonMap(user)
 	if err != nil {
 		return err
 	}
-	_, err = r.Client.Collection("users").Doc(user.UserID).Set(r.Context, data)
+
+	doc := r.Client.Collection("users").Doc(user.UserID)
+
+	exist, err := r.checkIfDataExists(doc)
+	if err != nil {
+		return err
+	}
+	if exist {
+		return ErrUserDataAlreadyExists
+	}
+
+	_, err = doc.Set(r.Context, data)
 	return err
 }
 
 func (r *DBRepository) PutUser(user *entity.PutUser) error {
-	info := []firestore.Update{{
-		Path:  "*",
-		Value: user,
-	}}
-	_, err := r.Client.Collection("users").Doc(user.UserID).Update(r.Context, info)
+
+	doc := r.Client.Collection("users").Doc(user.UserID)
+
+	exist, err := r.checkIfDataExists(doc)
+	if err != nil {
+		return err
+	}
+	if !exist {
+		return ErrUserDataNotFound
+	}
+
+	info := []firestore.Update{
+		{Path: "userName", Value: user.UserName},
+		{Path: "icon", Value: user.Icon},
+	}
+
+	_, err = doc.Update(r.Context, info)
 	return err
 }
