@@ -70,13 +70,13 @@ func (r *DBRepository) GetUser(userID string) (*entity.GetUser, error) {
 		return nil, ErrUserDataNotFound
 	}
 
-	docsnap, err := doc.Get(r.Context)
+	docSnap, err := doc.Get(r.Context)
 	if err != nil {
 		return nil, err
 	}
 
 	var user entity.GetUser
-	err = entity.BindToJsonStruct(docsnap.Data(), &user)
+	err = entity.BindToJsonStruct(docSnap.Data(), &user)
 	if err != nil {
 		return nil, err
 	}
