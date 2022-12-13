@@ -4,7 +4,9 @@ import (
 	"flyme-backend/app/config"
 	"flyme-backend/app/infra"
 	"flyme-backend/app/interfaces/handler"
+	"flyme-backend/app/interfaces/middleware"
 	"flyme-backend/app/logger"
+	"flyme-backend/app/packages/auth"
 	"flyme-backend/app/usecase"
 	"net/http"
 
@@ -38,9 +40,23 @@ func (s *Server) StartServer() {
 		return c.String(http.StatusOK, "pong")
 	})
 
+	s.Router.POST("/user", userHandler.CreateUser)
+	s.Router.POST("/login", userHandler.Login)
 	s.Router.GET("/user/:user_id", userHandler.ReadUser)
 	s.Router.PUT("/user/:user_id", userHandler.UpdateUser)
-	s.Router.POST("/user", userHandler.CreateUser)
+
+	// authorized '/ping' ---
+	r := s.Router.Group("/auth")
+	{
+		const contextKey = "user"
+		r.Use(middleware.Authentication(contextKey))
+
+		r.GET("/ping", func(c echo.Context) error {
+			ctx, _ := auth.GetUserContext(c.Get(contextKey))
+			return c.String(http.StatusOK, "pong by "+ctx.UserID)
+		})
+	}
+	// ---
 
 	if config.MODE == config.Production {
 		s.Router.HideBanner = true
