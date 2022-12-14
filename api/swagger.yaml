@@ -276,7 +276,7 @@ paths:
         content:
           "application/json":
             schema:
-              $ref: "#/components/schemas/History"
+              $ref: "#/components/schemas/PostHistoryRequest"
       summary: 移動履歴の登録
       responses:
         200:
@@ -364,6 +364,25 @@ components:
           example: 公立はこだて未来大学
         icon:
           type: string
+    PostHistoryRequest:
+      type: object
+      properties:
+        hour:
+          type: string
+          example: 3:34
+        coordinates:
+          type: array
+          items:
+            type: object
+            properties:
+              lat:
+                type: number
+                format: float
+                example: 41.841806
+              lng:
+                type: number
+                format: float
+                example: 140.766944
     History:
       type: object
       properties:
