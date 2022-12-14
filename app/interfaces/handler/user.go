@@ -111,3 +111,35 @@ func (h *UserHandler) UpdateUser(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, response)
 }
+
+func (h *UserHandler) Login(c echo.Context) error {
+
+	var req request.LoginRequest
+
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(
+			http.StatusBadRequest,
+			response.Error{
+				Code:    http.StatusBadRequest,
+				Message: err.Error(),
+			},
+		)
+	}
+
+	info, err := h.userUseCase.Login(&req)
+	if err != nil {
+		return c.JSON(
+			http.StatusNotFound,
+			response.Error{
+				Code:    http.StatusNotFound,
+				Message: err.Error(),
+			},
+		)
+	}
+
+	response := &response.LoginResponse{
+		Token: info.Token,
+	}
+
+	return c.JSON(http.StatusOK, response)
+}

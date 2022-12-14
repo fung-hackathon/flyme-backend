@@ -1,10 +1,12 @@
 package usecase
 
 import (
+	"errors"
 	"flyme-backend/app/domain/entity"
 	"flyme-backend/app/domain/repository"
 	"flyme-backend/app/interfaces/request"
 	"flyme-backend/app/interfaces/response"
+	"flyme-backend/app/packages/auth"
 )
 
 type UserUseCase struct {
@@ -75,6 +77,29 @@ func (u *UserUseCase) UpdateUser(userID string, req *request.UpdateUserRequest) 
 		UserID:   query.UserID,
 		UserName: query.UserName,
 		Icon:     query.Icon,
+	}
+
+	return res, nil
+}
+
+func (u *UserUseCase) Login(req *request.LoginRequest) (*response.LoginResponse, error) {
+	user, err := u.dbRepository.GetUser(req.UserID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if req.Passwd != user.Passwd {
+		return nil, errors.New("password incorrect")
+	}
+
+	token, err := auth.GenerateUserToken(req.UserID, req.Passwd)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &response.LoginResponse{
+		Token: token,
 	}
 
 	return res, nil

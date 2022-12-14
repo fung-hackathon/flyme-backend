@@ -5,6 +5,7 @@ import "encoding/json"
 type GetUser struct {
 	UserID   string `json:"userID"`
 	UserName string `json:"userName"`
+	Passwd   string `json:"passwd"`
 	Icon     string `json:"icon"`
 }
 

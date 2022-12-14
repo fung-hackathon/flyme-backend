@@ -17,3 +17,7 @@ type UpdateUserResponse struct {
 	UserName string `json:"userName"`
 	Icon     string `json:"icon"`
 }
+
+type LoginResponse struct {
+	Token string `json:"token"`
+}
