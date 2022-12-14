@@ -11,7 +11,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	echoMiddleware "github.com/labstack/echo/v4/middleware"
 )
 
 type Server struct {
@@ -26,7 +26,7 @@ func (s *Server) StartServer() {
 	s.Router.Use(logger.EchoLogger())
 
 	if config.MODE == config.Developing {
-		s.Router.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		s.Router.Use(echoMiddleware.CORSWithConfig(echoMiddleware.CORSConfig{
 			AllowOrigins: []string{"*"},
 			AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
 		}))
