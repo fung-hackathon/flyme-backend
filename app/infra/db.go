@@ -16,8 +16,8 @@ import (
 var (
 	ErrFirebaseInitializaition = errors.New("failed to initialize Firebase")
 	ErrFirestoreConnection     = errors.New("failed to establish connection to Firestore")
-	ErrUserDataNotFound        = errors.New("user data not found")
-	ErrUserDataAlreadyExists   = errors.New("user data already exists")
+	ErrUserNotFound            = errors.New("user not found")
+	ErrUserAlreadyExists       = errors.New("user already exists")
 )
 
 type DBRepository struct {
@@ -67,7 +67,7 @@ func (r *DBRepository) GetUser(userID string) (*entity.GetUser, error) {
 		return nil, err
 	}
 	if !exist {
-		return nil, ErrUserDataNotFound
+		return nil, ErrUserNotFound
 	}
 
 	docSnap, err := doc.Get(r.Context)
@@ -97,7 +97,7 @@ func (r *DBRepository) InsertUser(user *entity.InsertUser) error {
 		return err
 	}
 	if exist {
-		return ErrUserDataAlreadyExists
+		return ErrUserAlreadyExists
 	}
 
 	_, err = doc.Set(r.Context, data)
@@ -113,7 +113,7 @@ func (r *DBRepository) PutUser(user *entity.PutUser) error {
 		return err
 	}
 	if !exist {
-		return ErrUserDataNotFound
+		return ErrUserNotFound
 	}
 
 	info := []firestore.Update{

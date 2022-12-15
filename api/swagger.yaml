@@ -397,6 +397,25 @@ components:
           example: 公立はこだて未来大学
         icon:
           type: string
+    PostHistoryRequest:
+      type: object
+      properties:
+        hour:
+          type: string
+          example: 3:34
+        coordinates:
+          type: array
+          items:
+            type: object
+            properties:
+              lat:
+                type: number
+                format: float
+                example: 41.841806
+              lng:
+                type: number
+                format: float
+                example: 140.766944
     History:
       type: object
       properties:
