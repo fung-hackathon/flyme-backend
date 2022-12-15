@@ -32,7 +32,18 @@ func (s *Server) StartServer() {
 		}))
 	}
 
-	dbRepository, err := infra.NewDBRepository()
+	ctx, app, err := infra.FirebaseNewApp()
+
+	if err != nil {
+		logger.Log{
+			Message: "failed to initialize Firebase",
+			Cause:   err,
+		}.Err()
+		return
+	}
+
+	dbRepository, err := infra.NewDBRepository(ctx, app)
+
 	if err != nil {
 		logger.Log{
 			Message: "cannot establish DB repository",

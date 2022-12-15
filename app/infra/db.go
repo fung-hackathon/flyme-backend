@@ -3,21 +3,18 @@ package infra
 import (
 	"context"
 	"errors"
-	"flyme-backend/app/config"
 	"flyme-backend/app/domain/entity"
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go/v4"
-	"google.golang.org/api/option"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 var (
-	ErrFirebaseInitializaition = errors.New("failed to initialize Firebase")
-	ErrFirestoreConnection     = errors.New("failed to establish connection to Firestore")
-	ErrUserNotFound            = errors.New("user not found")
-	ErrUserAlreadyExists       = errors.New("user already exists")
+	ErrFirestoreConnection = errors.New("failed to establish connection to Firestore")
+	ErrUserNotFound        = errors.New("user not found")
+	ErrUserAlreadyExists   = errors.New("user already exists")
 )
 
 type DBRepository struct {
@@ -25,16 +22,7 @@ type DBRepository struct {
 	Context context.Context
 }
 
-func NewDBRepository() (*DBRepository, error) {
-	opt := option.WithCredentialsFile(config.GOOGLE_APPLICATION_CREDENTIALS)
-	conf := &firebase.Config{ProjectID: config.PROJECT_ID}
-
-	ctx := context.Background()
-	app, err := firebase.NewApp(ctx, conf, opt)
-	if err != nil {
-		return nil, ErrFirebaseInitializaition
-	}
-
+func NewDBRepository(ctx context.Context, app *firebase.App) (*DBRepository, error) {
 	client, err := app.Firestore(ctx)
 	if err != nil {
 		return nil, ErrFirestoreConnection
