@@ -268,7 +268,39 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /history/{userID}:
+  /history/{userID}/start:
+    get:
+      tags:
+        - History
+      parameters:
+        - $ref: "#/components/parameters/userID"
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/HistoryStart"
+      responses:
+        200:
+          description: 散歩開始をサーバに伝える
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/History"
+
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /history/{userID}/finish:
     post:
       tags:
         - History
@@ -276,7 +308,7 @@ paths:
         content:
           "application/json":
             schema:
-              $ref: "#/components/schemas/PostHistoryRequest"
+              $ref: "#/components/schemas/HistoryFinish"
       summary: 移動履歴の登録
       responses:
         200:
@@ -297,6 +329,7 @@ paths:
             "application/json":
               schema:
                 $ref: "#/components/schemas/Error"
+  /history/{userID}:
     get:
       tags:
         - History
@@ -386,6 +419,12 @@ components:
     History:
       type: object
       properties:
+        state:
+          type: string
+          example: finish
+        start:
+          type: string
+          example: 2006-01-02T15:04:05
         dist:
           type: number
           format: float
@@ -406,7 +445,31 @@ components:
                 type: number
                 format: float
                 example: 140.766944
-
+    HistoryStart:
+      type: object
+      properties:
+        start:
+          type: string
+          example: 2006-01-02T15:04:05
+    HistoryFinish:
+      type: object
+      properties:
+        hour:
+          type: string
+          example: 3:34
+        coordinates:
+          type: array
+          items:
+            type: object
+            properties:
+              lat:
+                type: number
+                format: float
+                example: 41.841806
+              lng:
+                type: number
+                format: float
+                example: 140.766944
     Histories:
       type: object
       properties:
