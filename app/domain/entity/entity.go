@@ -2,28 +2,12 @@ package entity
 
 import "encoding/json"
 
-type GetUser struct {
-	UserID   string `json:"userID"`
-	UserName string `json:"userName"`
-	Passwd   string `json:"passwd"`
-	Icon     string `json:"icon"`
-}
-
-type InsertUser struct {
-	UserID   string `json:"userID"`
-	UserName string `json:"userName"`
-	Passwd   string `json:"passwd"`
-	Icon     string `json:"icon"`
-}
-
-type PutUser struct {
-	UserID   string `json:"userID"`
-	UserName string `json:"userName"`
-	Icon     string `json:"icon"`
-}
-
 type Deserialize interface {
 	GetUser
+}
+
+type Serialize interface {
+	InsertUser
 }
 
 func BindToJsonStruct[T Deserialize](jm map[string]interface{}, js *T) error {
@@ -38,10 +22,6 @@ func BindToJsonStruct[T Deserialize](jm map[string]interface{}, js *T) error {
 	}
 
 	return nil
-}
-
-type Serialize interface {
-	InsertUser
 }
 
 func BindToJsonMap[T Serialize](js *T) (map[string]interface{}, error) {
