@@ -199,6 +199,8 @@ paths:
       tags:
         - Follow
       summary: フォロー申請する
+      parameters:
+        - $ref: "#/components/parameters/userID"
       responses:
         200:
           description: フォロワーのリスト
@@ -248,6 +250,8 @@ paths:
       tags:
         - Follow
       summary: フォロー申請を許可
+      parameters:
+        - $ref: "#/components/parameters/userID"
       responses:
         200:
           description: フォローリスト
@@ -269,11 +273,12 @@ paths:
                 $ref: "#/components/schemas/Error"
 
   /history/{userID}/start:
-    get:
+    post:
       tags:
         - History
       parameters:
         - $ref: "#/components/parameters/userID"
+      summary: 移動開始の登録
       requestBody:
         content:
           "application/json":
@@ -304,6 +309,8 @@ paths:
     post:
       tags:
         - History
+      parameters:
+        - $ref: "#/components/parameters/userID"
       requestBody:
         content:
           "application/json":
@@ -333,7 +340,7 @@ paths:
     get:
       tags:
         - History
-      summary: 移動履歴を新しい順で取得
+      summary: 自分の移動履歴を新しい順で取得
       parameters:
         - $ref: "#/components/parameters/userID"
         - $ref: "#/components/parameters/number"
@@ -344,6 +351,33 @@ paths:
             "application/json":
               schema:
                 $ref: "#/components/schemas/Histories"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+  /history/{userID}/timeline:
+    get:
+      tags:
+        - History
+      parameters:
+        - $ref: "#/components/parameters/userID"
+        - $ref: "#/components/parameters/number"
+      summary: Timeline
+      responses:
+        200:
+          description: 移動履歴を返却
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/HistoriesTimeline"
         400:
           description: ユーザからの入力おかしい
           content:
@@ -425,13 +459,13 @@ components:
         start:
           type: string
           example: 2006-01-02T15:04:05
+        finish:
+          type: string
+          example: 2006-01-02T15:04:05
         dist:
           type: number
           format: float
           example: 33.4
-        hour:
-          type: string
-          example: 3:34
         coordinates:
           type: array
           items:
@@ -454,9 +488,9 @@ components:
     HistoryFinish:
       type: object
       properties:
-        hour:
+        finish:
           type: string
-          example: 3:34
+          example: 2006-01-02T15:04:05
         coordinates:
           type: array
           items:
@@ -470,6 +504,24 @@ components:
                 type: number
                 format: float
                 example: 140.766944
+    HistoriesTimeline:
+      type: object
+      properties:
+        histories:
+          type: array
+          items:
+            properties:
+              user:
+                $ref: "#/components/schemas/User"
+              state:
+                type: string
+                example: state
+              start:
+                type: string
+                example: 2006-01-02T15:04:05
+              finish:
+                type: string
+                example: 2006-01-02T15:04:05
     Histories:
       type: object
       properties:
@@ -477,7 +529,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/History"
-
     Friends:
       type: object
       properties:
