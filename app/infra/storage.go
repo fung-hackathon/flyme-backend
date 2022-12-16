@@ -19,63 +19,6 @@ type BucketRepository struct {
 	bucket *storage.BucketHandle
 }
 
-func init() {
-	// ctx, app, err := FirebaseNewApp()
-	// if err != nil {
-	// 	logger.Log{
-	// 		Message: "Open file",
-	// 		Cause:   err,
-	// 	}.Err()
-	// 	return
-	// }
-
-	// r, err := NewBucket(ctx, app)
-	// if err != nil {
-	// 	logger.Log{
-	// 		Message: "Open file",
-	// 		Cause:   err,
-	// 	}.Err()
-	// 	return
-	// }
-
-	// f, err := os.Open("account.png")
-	// if err != nil {
-	// 	logger.Log{
-	// 		Message: "Open file",
-	// 		Cause:   err,
-	// 	}.Err()
-	// 	return
-	// }
-	// defer f.Close()
-
-	// err = r.InsertIconImg(f, "account.png")
-	// if err != nil {
-	// 	logger.Log{
-	// 		Message: "Open file",
-	// 		Cause:   err,
-	// 	}.Err()
-	// 	return
-	// }
-
-	// f, err := os.Create("hoge.png")
-	// if err != nil {
-	// 	logger.Log{
-	// 		Message: "Open file",
-	// 		Cause:   err,
-	// 	}.Err()
-	// 	return
-	// }
-
-	// err = r.SelectIconImg(f, "hoge")
-	// if err != nil {
-	// 	logger.Log{
-	// 		Message: "Open file",
-	// 		Cause:   err,
-	// 	}.Err()
-	// 	return
-	// }
-}
-
 func NewBucket(ctx context.Context, app *firebase.App) (*BucketRepository, error) {
 	client, err := app.Storage(context.Background())
 	if err != nil {
