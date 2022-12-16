@@ -11,7 +11,8 @@ type DBRepositoryImpl interface {
 	SendFollow(*entity.SendFollow) error
 
 	GetHistory(string) (*entity.GetHistory, error)
-	InsertHistory(*entity.InsertHistory) (*entity.GetHistory, error)
+	StartHistory(*entity.StartHistory) (*entity.HistoryTable, error)
+	FinishHistory(*entity.FinishHistory) (*entity.HistoryTable, error)
 
-	GetTimeline(string) (*entity.GetTimeline, error)
+	GetTimeline(string, int) (*entity.GetTimeline, error)
 }

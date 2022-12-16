@@ -2,18 +2,11 @@ package infra
 
 import (
 	"context"
-	"errors"
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go/v4"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-)
-
-var (
-	ErrFirestoreConnection = errors.New("failed to establish connection to Firestore")
-	ErrUserNotFound        = errors.New("user not found")
-	ErrUserAlreadyExists   = errors.New("user already exists")
 )
 
 type DBRepository struct {

@@ -1,5 +1,7 @@
 package entity
 
-type GetTimeline struct {
+type TimelineTable struct {
 	Histories []string `json:"histories"`
 }
+
+type GetTimeline = TimelineTable

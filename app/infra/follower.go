@@ -5,9 +5,54 @@ import (
 )
 
 func (r *DBRepository) GetFollowers(userID string) (*entity.GetFollowers, error) {
-	return nil, nil
+	doc := r.Client.Collection("followers").Doc(userID)
+
+	exist, err := r.checkIfDataExists(doc)
+	if err != nil {
+		return nil, err
+	}
+	if !exist {
+		return nil, ErrUserNotFound
+	}
+
+	docSnap, err := doc.Get(r.Context)
+	if err != nil {
+		return nil, err
+	}
+
+	var followers entity.GetFollowers
+	err = entity.BindToJsonStruct(docSnap.Data(), &followers)
+	if err != nil {
+		return nil, err
+	}
+
+	return &followers, nil
 }
 
 func (r *DBRepository) SendFollow(follow *entity.SendFollow) error {
-	return nil
+	doc := r.Client.Collection("followers").Doc(follow.FollowerUserID)
+
+	exist, err := r.checkIfDataExists(doc)
+	if err != nil {
+		return err
+	}
+	if !exist {
+		return ErrUserNotFound
+	}
+
+	docSnap, err := doc.Get(r.Context)
+	if err != nil {
+		return err
+	}
+
+	var followers entity.GetFollowers
+	err = entity.BindToJsonStruct(docSnap.Data(), &followers)
+	if err != nil {
+		return err
+	}
+
+	followers.Followers = append(followers.Followers, follow.FolloweeUserID)
+	_, err = doc.Set(r.Context, followers)
+
+	return err
 }

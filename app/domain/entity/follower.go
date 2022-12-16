@@ -1,7 +1,7 @@
 package entity
 
 type GetFollowers struct {
-	UserID []string `json:"followers"`
+	Followers []string `json:"followers"`
 }
 
 type SendFollow struct {

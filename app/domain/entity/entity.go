@@ -3,11 +3,11 @@ package entity
 import "encoding/json"
 
 type Deserialize interface {
-	GetUser
+	GetUser | GetTimeline | GetHistory | GetFollowers
 }
 
 type Serialize interface {
-	InsertUser
+	InsertUser | HistoryTable
 }
 
 func BindToJsonStruct[T Deserialize](jm map[string]interface{}, js *T) error {

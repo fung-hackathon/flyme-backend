@@ -1,10 +1,11 @@
 package entity
 
 type GetUser struct {
-	UserID   string `json:"userID"`
-	UserName string `json:"userName"`
-	Passwd   string `json:"passwd"`
-	Icon     string `json:"icon"`
+	UserID              string `json:"userID"`
+	UserName            string `json:"userName"`
+	Passwd              string `json:"passwd"`
+	HistoryIDInProgress string `json:"historyIDInProgress"`
+	Icon                string `json:"icon"`
 }
 
 type InsertUser struct {
