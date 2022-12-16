@@ -1,22 +1,14 @@
 package response
 
-type ReadUserResponse struct {
+type UserInfo struct {
 	UserID   string `json:"userID"`
 	UserName string `json:"userName"`
 	Icon     string `json:"icon"`
 }
 
-type CreateUserResponse struct {
-	UserID   string `json:"userID"`
-	UserName string `json:"userName"`
-	Icon     string `json:"icon"`
-}
-
-type UpdateUserResponse struct {
-	UserID   string `json:"userID"`
-	UserName string `json:"userName"`
-	Icon     string `json:"icon"`
-}
+type ReadUserResponse = UserInfo
+type CreateUserResponse = UserInfo
+type UpdateUserResponse = UserInfo
 
 type LoginResponse struct {
 	Token string `json:"token"`
