@@ -55,6 +55,18 @@ func (s *Server) StartServer() {
 	userUseCase := usecase.NewUseCase(dbRepository)
 	userHandler := handler.NewUserHandler(userUseCase)
 
+	bucketRepository, err := infra.NewBucket(ctx, app)
+	if err != nil {
+		logger.Log{
+			Message: "cannot establish DB repository",
+			Cause:   err,
+		}.Err()
+		return
+	}
+
+	imageUsecase := usecase.NewImageUseCase(bucketRepository, dbRepository)
+	imgHandler := handler.NewImageHandler(imageUsecase)
+
 	s.Router.GET("/ping", func(c echo.Context) error {
 		return c.String(http.StatusOK, "pong")
 	})
@@ -63,6 +75,9 @@ func (s *Server) StartServer() {
 	s.Router.POST("/login", userHandler.Login)
 	s.Router.GET("/user/:user_id", userHandler.ReadUser)
 	s.Router.PUT("/user/:user_id", userHandler.UpdateUser)
+
+	s.Router.POST("/icon/:user_id", imgHandler.UploadIcon)
+	s.Router.GET("/icon/:user_id", imgHandler.DownloadIcon)
 
 	// authorized '/ping' ---
 	r := s.Router.Group("/auth")

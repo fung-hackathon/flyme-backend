@@ -8,6 +8,7 @@ import (
 var (
 	PORT                           string
 	PROJECT_ID                     string
+	BUCKET_ID                      string
 	GOOGLE_APPLICATION_CREDENTIALS string
 	YOLP_APPID                     string
 	MODE                           Mode
@@ -31,6 +32,11 @@ func init() {
 	}
 
 	PROJECT_ID, err = getPROJECT_ID()
+	if err != nil {
+		panic(err)
+	}
+
+	BUCKET_ID, err = getBUCKET_ID()
 	if err != nil {
 		panic(err)
 	}
@@ -62,6 +68,15 @@ func getPORT() (string, error) {
 
 func getPROJECT_ID() (string, error) {
 	key := "PROJECT_ID"
+	e := os.Getenv(key)
+	if e == "" {
+		return "", fmt.Errorf("the environment variable %s must be filled", key)
+	}
+	return e, nil
+}
+
+func getBUCKET_ID() (string, error) {
+	key := "BUCKET_ID"
 	e := os.Getenv(key)
 	if e == "" {
 		return "", fmt.Errorf("the environment variable %s must be filled", key)

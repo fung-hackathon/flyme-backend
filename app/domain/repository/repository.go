@@ -1,6 +1,9 @@
 package repository
 
-import "flyme-backend/app/domain/entity"
+import (
+	"flyme-backend/app/domain/entity"
+	"io"
+)
 
 type DBRepositoryImpl interface {
 	GetUser(string) (*entity.GetUser, error)
@@ -15,4 +18,11 @@ type DBRepositoryImpl interface {
 	FinishHistory(*entity.FinishHistory) (*entity.HistoryTable, error)
 
 	GetTimeline(string, int) (*entity.GetTimeline, error)
+
+	CheckUserExist(userID string) (bool, error)
+}
+
+type ImageRepositoryImpl interface {
+	UploadIconImg(file io.Reader, userID string) error
+	DownloadIconImg(file io.Writer, userID string) error
 }
