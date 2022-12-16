@@ -7,7 +7,7 @@ type Deserialize interface {
 }
 
 type Serialize interface {
-	InsertUser | HistoryTable
+	UserTable | TimelineTable | HistoryTable | FollowerTable
 }
 
 func BindToJsonStruct[T Deserialize](jm map[string]interface{}, js *T) error {

@@ -45,14 +45,20 @@ func (r *DBRepository) SendFollow(follow *entity.SendFollow) error {
 		return err
 	}
 
-	var followers entity.GetFollowers
+	var followers entity.FollowerTable
 	err = entity.BindToJsonStruct(docSnap.Data(), &followers)
 	if err != nil {
 		return err
 	}
 
 	followers.Followers = append(followers.Followers, follow.FolloweeUserID)
-	_, err = doc.Set(r.Context, followers)
+
+	data, err := entity.BindToJsonMap(&followers)
+	if err != nil {
+		return err
+	}
+
+	_, err = doc.Set(r.Context, data)
 
 	return err
 }

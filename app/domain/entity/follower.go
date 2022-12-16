@@ -1,8 +1,10 @@
 package entity
 
-type GetFollowers struct {
+type FollowerTable struct {
 	Followers []string `json:"followers"`
 }
+
+type GetFollowers = FollowerTable
 
 type SendFollow struct {
 	FolloweeUserID string `json:"followeeUserID"`

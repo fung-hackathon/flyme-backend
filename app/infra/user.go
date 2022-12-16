@@ -33,23 +33,77 @@ func (r *DBRepository) GetUser(userID string) (*entity.GetUser, error) {
 }
 
 func (r *DBRepository) InsertUser(user *entity.InsertUser) error {
-	data, err := entity.BindToJsonMap(user)
-	if err != nil {
-		return err
+
+	// user欄を追加
+	{
+		userDoc := r.Client.Collection("users").Doc(user.UserID)
+
+		exist, err := r.checkIfDataExists(userDoc)
+		if err != nil {
+			return err
+		}
+		if exist {
+			return ErrUserAlreadyExists
+		}
+
+		userTable := entity.UserTable{
+			UserID:              user.UserID,
+			UserName:            user.UserName,
+			Passwd:              user.Passwd,
+			Icon:                user.Icon,
+			HistoryIDInProgress: "",
+		}
+
+		data, err := entity.BindToJsonMap(&userTable)
+		if err != nil {
+			return err
+		}
+
+		_, err = userDoc.Set(r.Context, data)
+		if err != nil {
+			return err
+		}
 	}
 
-	doc := r.Client.Collection("users").Doc(user.UserID)
+	// follower欄を追加
+	{
+		followerDoc := r.Client.Collection("followers").Doc(user.UserID)
 
-	exist, err := r.checkIfDataExists(doc)
-	if err != nil {
-		return err
-	}
-	if exist {
-		return ErrUserAlreadyExists
+		followerTable := entity.FollowerTable{
+			Followers: make([]string, 0),
+		}
+
+		data, err := entity.BindToJsonMap(&followerTable)
+		if err != nil {
+			return err
+		}
+
+		_, err = followerDoc.Set(r.Context, data)
+		if err != nil {
+			return err
+		}
 	}
 
-	_, err = doc.Set(r.Context, data)
-	return err
+	// timeline欄を追加
+	{
+		timelineDoc := r.Client.Collection("timelines").Doc(user.UserID)
+
+		timelineTable := entity.TimelineTable{
+			Histories: make([]string, 0),
+		}
+
+		data, err := entity.BindToJsonMap(&timelineTable)
+		if err != nil {
+			return err
+		}
+
+		_, err = timelineDoc.Set(r.Context, data)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (r *DBRepository) PutUser(user *entity.PutUser) error {
