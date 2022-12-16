@@ -35,6 +35,19 @@ func (r *DBRepository) Close() {
 	r.Client.Close()
 }
 
+func (r *DBRepository) CheckUserExist(userID string) (bool, error) {
+	doc := r.Client.Collection("users").Doc(userID)
+
+	_, err := doc.Get(r.Context)
+	if err == nil {
+		return true, nil
+	} else if status.Code(err) == codes.NotFound {
+		return false, nil
+	} else {
+		return false, err
+	}
+}
+
 func (r *DBRepository) checkIfDataExists(doc *firestore.DocumentRef) (bool, error) {
 	_, err := doc.Get(r.Context)
 	if err == nil {
