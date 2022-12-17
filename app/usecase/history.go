@@ -45,6 +45,7 @@ func (u *HistoryUseCase) FinishHistory(userID string, req *request.FinishHistory
 	history, err := u.dbRepository.FinishHistory(&entity.FinishHistory{
 		Coords:     hcoords,
 		UserID:     userID,
+		Distance:   req.Distance,
 		FinishTime: req.FinishTime,
 	})
 

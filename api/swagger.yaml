@@ -588,6 +588,10 @@ components:
         finish:
           type: string
           example: 2006-01-02T15:04:05
+        dist:
+          type: number
+          format: float
+          example: 33.4
         coordinates:
           type: array
           items:
