@@ -19,6 +19,10 @@ type HistoryTable struct {
 
 type GetHistory = HistoryTable
 
+type GetHistories struct {
+	Histories []GetHistory
+}
+
 type StartHistory struct {
 	UserID    string
 	StartTime string

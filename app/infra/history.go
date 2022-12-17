@@ -5,6 +5,7 @@ import (
 	"flyme-backend/app/packages/geo"
 
 	"cloud.google.com/go/firestore"
+	"google.golang.org/api/iterator"
 )
 
 func (r *DBRepository) GetHistory(historyID string) (*entity.GetHistory, error) {
@@ -30,6 +31,35 @@ func (r *DBRepository) GetHistory(historyID string) (*entity.GetHistory, error) 
 	}
 
 	return &history, nil
+}
+
+func (r *DBRepository) GetHistories(userID string, size int) (*entity.GetHistories, error) {
+	iter := r.Client.Collection("histories").Where("user_id", "==", userID).Documents(r.Context)
+
+	histories := make([]entity.GetHistory, size)
+
+	for i := 0; i < size; i++ {
+		docSnap, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+
+		var history entity.GetHistory
+		err = entity.BindToJsonStruct(docSnap.Data(), &history)
+		if err != nil {
+			return nil, err
+		}
+
+		histories[i] = history
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return &entity.GetHistories{
+		Histories: histories,
+	}, nil
 }
 
 func (r *DBRepository) StartHistory(history *entity.StartHistory) (*entity.HistoryTable, error) {
