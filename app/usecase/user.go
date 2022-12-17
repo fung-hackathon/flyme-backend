@@ -3,28 +3,32 @@ package usecase
 import (
 	"errors"
 	"flyme-backend/app/domain/entity"
+	"flyme-backend/app/domain/repository"
 	"flyme-backend/app/interfaces/request"
-	"flyme-backend/app/interfaces/response"
 	"flyme-backend/app/packages/auth"
 )
 
-func (u *UserUseCase) ReadUser(userID string) (*response.ReadUserResponse, error) {
+type UserUseCase struct {
+	dbRepository repository.DBRepositoryImpl
+}
+
+func NewUserUseCase(r repository.DBRepositoryImpl) *UserUseCase {
+	return &UserUseCase{
+		dbRepository: r,
+	}
+}
+
+func (u *UserUseCase) ReadUser(userID string) (*entity.UserTable, error) {
 	user, err := u.dbRepository.GetUser(userID)
 
 	if err != nil {
 		return nil, err
 	}
 
-	res := &response.ReadUserResponse{
-		UserID:   user.UserID,
-		UserName: user.UserName,
-		Icon:     user.Icon,
-	}
-
-	return res, nil
+	return user, nil
 }
 
-func (u *UserUseCase) CreateUser(req *request.CreateUserRequest) (*response.CreateUserResponse, error) {
+func (u *UserUseCase) CreateUser(req *request.CreateUserRequest) (*entity.InsertUser, error) {
 
 	// TODO: Default Icon
 
@@ -40,16 +44,10 @@ func (u *UserUseCase) CreateUser(req *request.CreateUserRequest) (*response.Crea
 		return nil, err
 	}
 
-	res := &response.CreateUserResponse{
-		UserID:   query.UserID,
-		UserName: query.UserName,
-		Icon:     query.Icon,
-	}
-
-	return res, nil
+	return query, nil
 }
 
-func (u *UserUseCase) UpdateUser(userID string, req *request.UpdateUserRequest) (*response.UpdateUserResponse, error) {
+func (u *UserUseCase) UpdateUser(userID string, req *request.UpdateUserRequest) (*entity.PutUser, error) {
 
 	query := &entity.PutUser{
 		UserID:   userID,
@@ -62,34 +60,24 @@ func (u *UserUseCase) UpdateUser(userID string, req *request.UpdateUserRequest) 
 		return nil, err
 	}
 
-	res := &response.UpdateUserResponse{
-		UserID:   query.UserID,
-		UserName: query.UserName,
-		Icon:     query.Icon,
-	}
-
-	return res, nil
+	return query, nil
 }
 
-func (u *UserUseCase) Login(req *request.LoginRequest) (*response.LoginResponse, error) {
+func (u *UserUseCase) Login(req *request.LoginRequest) (string, error) {
 	user, err := u.dbRepository.GetUser(req.UserID)
 
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	if req.Passwd != user.Passwd {
-		return nil, errors.New("password incorrect")
+		return "", errors.New("password incorrect")
 	}
 
 	token, err := auth.GenerateUserToken(req.UserID, req.Passwd)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	res := &response.LoginResponse{
-		Token: token,
-	}
-
-	return res, nil
+	return token, nil
 }

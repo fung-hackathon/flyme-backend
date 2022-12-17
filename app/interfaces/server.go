@@ -6,7 +6,6 @@ import (
 	"flyme-backend/app/interfaces/handler"
 	"flyme-backend/app/interfaces/middleware"
 	"flyme-backend/app/logger"
-	"flyme-backend/app/packages/auth"
 	"flyme-backend/app/usecase"
 	"net/http"
 
@@ -52,8 +51,14 @@ func (s *Server) StartServer() {
 		return
 	}
 
-	userUseCase := usecase.NewUseCase(dbRepository)
+	userUseCase := usecase.NewUserUseCase(dbRepository)
 	userHandler := handler.NewUserHandler(userUseCase)
+
+	followUseCase := usecase.NewFollowUseCase(dbRepository)
+	followHandler := handler.NewFollowHandler(followUseCase)
+
+	historyUseCase := usecase.NewHistoryUseCase(dbRepository)
+	historyHandler := handler.NewHistoryHandler(historyUseCase)
 
 	bucketRepository, err := infra.NewBucket(ctx, app)
 	if err != nil {
@@ -74,23 +79,32 @@ func (s *Server) StartServer() {
 	s.Router.POST("/user", userHandler.CreateUser)
 	s.Router.POST("/login", userHandler.Login)
 	s.Router.GET("/user/:user_id", userHandler.ReadUser)
-	s.Router.PUT("/user/:user_id", userHandler.UpdateUser)
 
-	s.Router.POST("/icon/:user_id", imgHandler.UploadIcon)
-	s.Router.GET("/icon/:user_id", imgHandler.DownloadIcon)
-
-	// authorized '/ping' ---
-	r := s.Router.Group("/auth")
+	ur := s.Router.Group("")
 	{
-		const contextKey = "user"
-		r.Use(middleware.Authentication(contextKey))
-
-		r.GET("/ping", func(c echo.Context) error {
-			ctx, _ := auth.GetUserContext(c.Get(contextKey))
-			return c.String(http.StatusOK, "pong by "+ctx.UserID)
-		})
+		ur.Use(middleware.Authentication("user"))
+		ur.PUT("/user/:user_id", userHandler.UpdateUser)
+		ur.POST("/icon/:user_id", imgHandler.UploadIcon)
+		ur.GET("/icon/:user_id", imgHandler.DownloadIcon)
 	}
-	// ---
+
+	fr := s.Router.Group("/follow")
+	{
+		fr.Use(middleware.Authentication("user"))
+
+		fr.GET("/:user_id", followHandler.ListFollower)
+		fr.POST("/:user_id", followHandler.SendFollow)
+	}
+
+	hr := s.Router.Group("/history")
+	{
+		hr.Use(middleware.Authentication("user"))
+
+		hr.POST("/:user_id/start", historyHandler.StartHistory)
+		hr.POST("/:user_id/finish", historyHandler.FinishHistory)
+		hr.GET("/:user_id", historyHandler.ReadHistories)
+		hr.GET("/:user_id/timeline", historyHandler.ReadTimeline)
+	}
 
 	if config.MODE == config.Production {
 		s.Router.HideBanner = true

@@ -1,10 +1,13 @@
 package infra
 
 import (
+	"errors"
 	"flyme-backend/app/domain/entity"
 	"flyme-backend/app/packages/geo"
+	"sort"
 
 	"cloud.google.com/go/firestore"
+	"google.golang.org/api/iterator"
 )
 
 func (r *DBRepository) GetHistory(historyID string) (*entity.GetHistory, error) {
@@ -32,6 +35,44 @@ func (r *DBRepository) GetHistory(historyID string) (*entity.GetHistory, error) 
 	return &history, nil
 }
 
+func (r *DBRepository) GetHistories(userID string, size int) (*entity.GetHistories, error) {
+	iter := r.Client.Collection("histories").Where("userID", "==", userID).Documents(r.Context)
+
+	histories := []entity.GetHistory{}
+
+	for {
+		docSnap, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+
+		var history entity.GetHistory
+		err = entity.BindToJsonStruct(docSnap.Data(), &history)
+		if err != nil {
+			return nil, err
+		}
+
+		histories = append(histories, history)
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// Future Work: sortとlimitはデータ取得時に行うべき
+	sort.Slice(histories, func(i, j int) bool {
+		return histories[i].Start > histories[j].Start
+	})
+
+	if len(histories) >= size {
+		histories = histories[:size]
+	}
+
+	return &entity.GetHistories{
+		Histories: histories,
+	}, nil
+}
+
 func (r *DBRepository) StartHistory(history *entity.StartHistory) (*entity.HistoryTable, error) {
 
 	historyID := entity.NewHistoryID()
@@ -41,8 +82,49 @@ func (r *DBRepository) StartHistory(history *entity.StartHistory) (*entity.Histo
 		Finish:    "",
 		Start:     history.StartTime,
 		State:     "start",
+		Ticket:    history.Ticket,
 		UserID:    history.UserID,
 		HistoryID: historyID,
+	}
+
+	// userのhistoryIDInProgressの更新
+	{
+		doc := r.Client.Collection("users").Doc(historyTable.UserID)
+
+		exist, err := r.checkIfDataExists(doc)
+		if err != nil {
+			return nil, err
+		}
+		if !exist {
+			return nil, ErrUserNotFound
+		}
+
+		docSnap, err := doc.Get(r.Context)
+		if err != nil {
+			return nil, err
+		}
+
+		var user entity.GetUser
+		err = entity.BindToJsonStruct(docSnap.Data(), &user)
+		if err != nil {
+			return nil, err
+		}
+
+		if user.HistoryIDInProgress != "" {
+			_, err := r.Client.Collection("histories").Doc(user.HistoryIDInProgress).Delete(r.Context)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		info := []firestore.Update{
+			{Path: "historyIDInProgress", Value: historyTable.HistoryID},
+		}
+
+		_, err = doc.Update(r.Context, info)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// historiesにhistoryを追加
@@ -60,34 +142,10 @@ func (r *DBRepository) StartHistory(history *entity.StartHistory) (*entity.Histo
 		}
 	}
 
-	// userのhistoryIDInProgressの更新
-	{
-		doc := r.Client.Collection("users").Doc(historyTable.UserID)
-
-		exist, err := r.checkIfDataExists(doc)
-		if err != nil {
-			return nil, err
-		}
-		if !exist {
-			return nil, ErrUserNotFound
-		}
-
-		info := []firestore.Update{
-			{Path: "historyIDInProgress", Value: historyTable.HistoryID},
-		}
-
-		_, err = doc.Update(r.Context, info)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	return &historyTable, nil
 }
 
 func (r *DBRepository) FinishHistory(history *entity.FinishHistory) (*entity.HistoryTable, error) {
-
-	var user entity.GetUser
 
 	// userのドキュメントを保持
 	userDoc := r.Client.Collection("users").Doc(history.UserID)
@@ -101,6 +159,7 @@ func (r *DBRepository) FinishHistory(history *entity.FinishHistory) (*entity.His
 	}
 
 	// user情報の取得
+	var user entity.GetUser
 	{
 		docSnap, err := userDoc.Get(r.Context)
 		if err != nil {
@@ -114,6 +173,10 @@ func (r *DBRepository) FinishHistory(history *entity.FinishHistory) (*entity.His
 	}
 
 	historyID := user.HistoryIDInProgress
+
+	if historyID == "" {
+		return nil, errors.New("unknown history")
+	}
 
 	geoCoords := make([]geo.Coordinate, len(history.Coords))
 	for i, c := range history.Coords {
@@ -129,6 +192,9 @@ func (r *DBRepository) FinishHistory(history *entity.FinishHistory) (*entity.His
 		return nil, err
 	}
 
+	// historyのドキュメントを保持
+	historiesDoc := r.Client.Collection("histories").Doc(historyID)
+
 	// 更新情報を一旦取りまとめる
 	historyTable := entity.HistoryTable{
 		Coords:    history.Coords,
@@ -138,9 +204,6 @@ func (r *DBRepository) FinishHistory(history *entity.FinishHistory) (*entity.His
 		UserID:    history.UserID,
 		HistoryID: historyID,
 	}
-
-	// historyのドキュメントを保持
-	historiesDoc := r.Client.Collection("histories").Doc(historyTable.HistoryID)
 
 	exist, err = r.checkIfDataExists(historiesDoc)
 	if err != nil {
@@ -153,10 +216,10 @@ func (r *DBRepository) FinishHistory(history *entity.FinishHistory) (*entity.His
 	// historyを更新
 	{
 		info := []firestore.Update{
+			{Path: "state", Value: historyTable.State},
 			{Path: "coordinates", Value: historyTable.Coords},
 			{Path: "dist", Value: historyTable.Dist},
 			{Path: "finish", Value: historyTable.Finish},
-			{Path: "state", Value: historyTable.State},
 		}
 
 		_, err = historiesDoc.Update(r.Context, info)
@@ -179,13 +242,16 @@ func (r *DBRepository) FinishHistory(history *entity.FinishHistory) (*entity.His
 
 	// 全followersのTLを更新
 	{
-		followers, err := r.GetFollowers(historyTable.HistoryID)
+		followers, err := r.GetFollowers(historyTable.UserID)
 		if err != nil {
 			return nil, err
 		}
 
 		for _, fid := range followers.Followers {
-			r.insertHistoryToTimeline(fid, historyTable.HistoryID)
+			_, err := r.insertHistoryToTimeline(fid, historyTable.HistoryID)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 

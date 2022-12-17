@@ -25,6 +25,11 @@ func floatToStr(f float64) string {
 }
 
 func GetDistanceKm(coord []Coordinate) (float64, error) {
+
+	if len(coord) <= 1 {
+		return 0., nil
+	}
+
 	base := "https://map.yahooapis.jp/dist/V1/distance"
 	appid := config.YOLP_APPID
 	output := "json"
