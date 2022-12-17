@@ -26,12 +26,22 @@ func (h *HistoryHandler) StartHistory(c echo.Context) error {
 
 	claims, err := auth.GetUserContext(c.Get("user"))
 
-	if err != nil || claims.UserID != userID {
+	if err != nil {
 		return c.JSON(
 			http.StatusUnauthorized,
 			response.Error{
 				Code:    http.StatusUnauthorized,
 				Message: err.Error(),
+			},
+		)
+	}
+
+	if claims.UserID != userID {
+		return c.JSON(
+			http.StatusUnauthorized,
+			response.Error{
+				Code:    http.StatusUnauthorized,
+				Message: "not authorized",
 			},
 		)
 	}
@@ -59,7 +69,24 @@ func (h *HistoryHandler) StartHistory(c echo.Context) error {
 		)
 	}
 
-	return c.JSON(http.StatusOK, history)
+	rcoords := make([]response.Coordinate, len(history.Coords))
+
+	for i, c := range history.Coords {
+		rcoords[i] = response.Coordinate{
+			Longitude: c.Longitude,
+			Latitude:  c.Latitude,
+		}
+	}
+
+	response := &response.StartHistoryResponse{
+		Coords: rcoords,
+		Dist:   history.Dist,
+		Finish: history.Finish,
+		Start:  history.Start,
+		State:  history.State,
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *HistoryHandler) FinishHistory(c echo.Context) error {
@@ -67,12 +94,22 @@ func (h *HistoryHandler) FinishHistory(c echo.Context) error {
 
 	claims, err := auth.GetUserContext(c.Get("user"))
 
-	if err != nil || claims.UserID != userID {
+	if err != nil {
 		return c.JSON(
 			http.StatusUnauthorized,
 			response.Error{
 				Code:    http.StatusUnauthorized,
 				Message: err.Error(),
+			},
+		)
+	}
+
+	if claims.UserID != userID {
+		return c.JSON(
+			http.StatusUnauthorized,
+			response.Error{
+				Code:    http.StatusUnauthorized,
+				Message: "not authorized",
 			},
 		)
 	}
@@ -99,7 +136,24 @@ func (h *HistoryHandler) FinishHistory(c echo.Context) error {
 		)
 	}
 
-	return c.JSON(http.StatusOK, history)
+	rcoords := make([]response.Coordinate, len(req.Coords))
+
+	for i, c := range history.Coords {
+		rcoords[i] = response.Coordinate{
+			Longitude: c.Longitude,
+			Latitude:  c.Latitude,
+		}
+	}
+
+	response := &response.FinishHistoryResponse{
+		Coords: rcoords,
+		Dist:   history.Dist,
+		Finish: history.Finish,
+		Start:  history.Start,
+		State:  history.State,
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *HistoryHandler) ReadHistories(c echo.Context) error {
@@ -108,12 +162,22 @@ func (h *HistoryHandler) ReadHistories(c echo.Context) error {
 
 	claims, err := auth.GetUserContext(c.Get("user"))
 
-	if err != nil || claims.UserID != userID {
+	if err != nil {
 		return c.JSON(
 			http.StatusUnauthorized,
 			response.Error{
 				Code:    http.StatusUnauthorized,
 				Message: err.Error(),
+			},
+		)
+	}
+
+	if claims.UserID != userID {
+		return c.JSON(
+			http.StatusUnauthorized,
+			response.Error{
+				Code:    http.StatusUnauthorized,
+				Message: "not authorized",
 			},
 		)
 	}
@@ -141,7 +205,33 @@ func (h *HistoryHandler) ReadHistories(c echo.Context) error {
 		)
 	}
 
-	return c.JSON(http.StatusOK, histories)
+	rtimeline := []response.HistoryTable{}
+
+	for _, history := range histories.Histories {
+
+		rcoords := make([]response.Coordinate, len(history.Coords))
+
+		for i, c := range history.Coords {
+			rcoords[i] = response.Coordinate{
+				Longitude: c.Longitude,
+				Latitude:  c.Latitude,
+			}
+		}
+
+		rtimeline = append(rtimeline, response.HistoryTable{
+			Coords: rcoords,
+			Dist:   history.Dist,
+			Finish: history.Finish,
+			Start:  history.Start,
+			State:  history.Start,
+		})
+	}
+
+	response := &response.ReadHistoriesResponse{
+		Histories: rtimeline,
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *HistoryHandler) ReadTimeline(c echo.Context) error {
@@ -149,12 +239,22 @@ func (h *HistoryHandler) ReadTimeline(c echo.Context) error {
 
 	claims, err := auth.GetUserContext(c.Get("user"))
 
-	if err != nil || claims.UserID != userID {
+	if err != nil {
 		return c.JSON(
 			http.StatusUnauthorized,
 			response.Error{
 				Code:    http.StatusUnauthorized,
 				Message: err.Error(),
+			},
+		)
+	}
+
+	if claims.UserID != userID {
+		return c.JSON(
+			http.StatusUnauthorized,
+			response.Error{
+				Code:    http.StatusUnauthorized,
+				Message: "not authorized",
 			},
 		)
 	}
@@ -171,7 +271,7 @@ func (h *HistoryHandler) ReadTimeline(c echo.Context) error {
 		)
 	}
 
-	timeline, err := h.historyUseCase.ReadTimeline(userID, int(size))
+	histories, users, err := h.historyUseCase.ReadTimeline(userID, int(size))
 	if err != nil {
 		return c.JSON(
 			http.StatusNotFound,
@@ -182,5 +282,25 @@ func (h *HistoryHandler) ReadTimeline(c echo.Context) error {
 		)
 	}
 
-	return c.JSON(http.StatusOK, timeline)
+	timeline := []response.HistoryTimeline{}
+
+	for i := range timeline {
+
+		timeline = append(timeline, response.HistoryTimeline{
+			User: response.UserInfo{
+				UserID:   users[i].UserID,
+				UserName: users[i].UserName,
+				Icon:     users[i].Icon,
+			},
+			Finish: histories[i].Finish,
+			Start:  histories[i].Start,
+			State:  histories[i].State,
+		})
+	}
+
+	response := &response.ReadTimelineResponse{
+		Histories: timeline,
+	}
+
+	return c.JSON(http.StatusOK, response)
 }

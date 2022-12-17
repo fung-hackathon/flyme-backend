@@ -22,7 +22,30 @@ func NewFollowHandler(u *usecase.FollowUseCase) *FollowHandler {
 func (h *FollowHandler) ListFollower(c echo.Context) error {
 
 	userID := c.Param("user_id")
-	friends, err := h.followUseCase.ListFollower(userID)
+
+	claims, err := auth.GetUserContext(c.Get("user"))
+
+	if err != nil {
+		return c.JSON(
+			http.StatusUnauthorized,
+			response.Error{
+				Code:    http.StatusUnauthorized,
+				Message: err.Error(),
+			},
+		)
+	}
+
+	if claims.UserID != userID {
+		return c.JSON(
+			http.StatusUnauthorized,
+			response.Error{
+				Code:    http.StatusUnauthorized,
+				Message: "not authorized",
+			},
+		)
+	}
+
+	followers, err := h.followUseCase.ListFollower(userID)
 	if err != nil {
 		return c.JSON(
 			http.StatusNotFound,
@@ -33,7 +56,21 @@ func (h *FollowHandler) ListFollower(c echo.Context) error {
 		)
 	}
 
-	return c.JSON(http.StatusOK, friends)
+	friends := make([]response.UserInfo, len(followers))
+
+	for i, user := range followers {
+		friends[i] = response.UserInfo{
+			UserID:   user.UserID,
+			UserName: user.UserName,
+			Icon:     user.Icon,
+		}
+	}
+
+	response := &response.ListFollowerResponse{
+		Friends: friends,
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *FollowHandler) SendFollow(c echo.Context) error {
@@ -54,6 +91,16 @@ func (h *FollowHandler) SendFollow(c echo.Context) error {
 
 	followeeUserID := claims.UserID
 
+	if followeeUserID == followerUserID {
+		return c.JSON(
+			http.StatusBadRequest,
+			response.Error{
+				Code:    http.StatusBadRequest,
+				Message: "cannot follow yourself",
+			},
+		)
+	}
+
 	user, err := h.followUseCase.SendFollow(followeeUserID, followerUserID)
 	if err != nil {
 		return c.JSON(
@@ -65,5 +112,11 @@ func (h *FollowHandler) SendFollow(c echo.Context) error {
 		)
 	}
 
-	return c.JSON(http.StatusOK, user)
+	response := &response.SendFollowResponse{
+		UserID:   user.UserID,
+		UserName: user.UserName,
+		Icon:     user.Icon,
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
