@@ -3,7 +3,6 @@ package infra
 import (
 	"errors"
 	"flyme-backend/app/domain/entity"
-	"flyme-backend/app/packages/geo"
 	"sort"
 
 	"cloud.google.com/go/firestore"
@@ -177,20 +176,6 @@ func (r *DBRepository) FinishHistory(history *entity.FinishHistory) (*entity.His
 	if historyID == "" {
 		return nil, errors.New("unknown history")
 	}
-
-	geoCoords := make([]geo.Coordinate, len(history.Coords))
-	for i, c := range history.Coords {
-		geoCoords[i] = geo.Coordinate{
-			Longitude: c.Longitude,
-			Latitude:  c.Latitude,
-		}
-	}
-
-	// 総距離を計測
-	// dist, err := geo.GetDistanceKm(geoCoords)
-	// if err != nil {
-	// 	return nil, err
-	// }
 
 	// historyのドキュメントを保持
 	historiesDoc := r.Client.Collection("histories").Doc(historyID)
