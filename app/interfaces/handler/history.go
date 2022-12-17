@@ -84,6 +84,7 @@ func (h *HistoryHandler) StartHistory(c echo.Context) error {
 		Finish: history.Finish,
 		Start:  history.Start,
 		State:  history.State,
+		Ticket: history.Ticket,
 	}
 
 	return c.JSON(http.StatusOK, response)
@@ -151,6 +152,7 @@ func (h *HistoryHandler) FinishHistory(c echo.Context) error {
 		Finish: history.Finish,
 		Start:  history.Start,
 		State:  history.State,
+		Ticket: history.Ticket,
 	}
 
 	return c.JSON(http.StatusOK, response)
@@ -224,6 +226,7 @@ func (h *HistoryHandler) ReadHistories(c echo.Context) error {
 			Finish: history.Finish,
 			Start:  history.Start,
 			State:  history.Start,
+			Ticket: history.Ticket,
 		})
 	}
 
@@ -284,8 +287,7 @@ func (h *HistoryHandler) ReadTimeline(c echo.Context) error {
 
 	timeline := []response.HistoryTimeline{}
 
-	for i := range timeline {
-
+	for i := range histories {
 		timeline = append(timeline, response.HistoryTimeline{
 			User: response.UserInfo{
 				UserID:   users[i].UserID,
@@ -295,6 +297,7 @@ func (h *HistoryHandler) ReadTimeline(c echo.Context) error {
 			Finish: histories[i].Finish,
 			Start:  histories[i].Start,
 			State:  histories[i].State,
+			Ticket: histories[i].Ticket,
 		})
 	}
 
