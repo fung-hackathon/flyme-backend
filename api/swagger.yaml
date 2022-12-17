@@ -477,6 +477,9 @@ components:
         start:
           type: string
           example: 2006-01-02T15:04:05
+        ticket:
+          type: string
+          example: MOON
         finish:
           type: string
           example: 2006-01-02T15:04:05
@@ -503,6 +506,9 @@ components:
         start:
           type: string
           example: 2006-01-02T15:04:05
+        ticket:
+          type: string
+          example: MOON
     HistoryFinish:
       type: object
       properties:
@@ -537,6 +543,9 @@ components:
               start:
                 type: string
                 example: 2006-01-02T15:04:05
+              ticket:
+                type: string
+                example: MOON
               finish:
                 type: string
                 example: 2006-01-02T15:04:05

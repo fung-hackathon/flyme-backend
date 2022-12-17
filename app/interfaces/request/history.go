@@ -7,6 +7,7 @@ type Coordinate struct {
 
 type StartHistoryRequest struct {
 	StartTime string `json:"start"`
+	Ticket    string `json:"ticket"`
 }
 
 type FinishHistoryRequest struct {

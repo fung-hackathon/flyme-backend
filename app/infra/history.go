@@ -82,6 +82,7 @@ func (r *DBRepository) StartHistory(history *entity.StartHistory) (*entity.Histo
 		Finish:    "",
 		Start:     history.StartTime,
 		State:     "start",
+		Ticket:    history.Ticket,
 		UserID:    history.UserID,
 		HistoryID: historyID,
 	}
