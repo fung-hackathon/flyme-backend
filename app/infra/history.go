@@ -187,10 +187,10 @@ func (r *DBRepository) FinishHistory(history *entity.FinishHistory) (*entity.His
 	}
 
 	// 総距離を計測
-	dist, err := geo.GetDistanceKm(geoCoords)
-	if err != nil {
-		return nil, err
-	}
+	// dist, err := geo.GetDistanceKm(geoCoords)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// historyのドキュメントを保持
 	historiesDoc := r.Client.Collection("histories").Doc(historyID)
@@ -198,7 +198,7 @@ func (r *DBRepository) FinishHistory(history *entity.FinishHistory) (*entity.His
 	// 更新情報を一旦取りまとめる
 	historyTable := entity.HistoryTable{
 		Coords:    history.Coords,
-		Dist:      dist,
+		Dist:      history.Distance,
 		Finish:    history.FinishTime,
 		State:     "finish",
 		UserID:    history.UserID,

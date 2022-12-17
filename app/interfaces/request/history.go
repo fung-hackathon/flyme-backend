@@ -12,5 +12,6 @@ type StartHistoryRequest struct {
 
 type FinishHistoryRequest struct {
 	Coords     []Coordinate `json:"coordinates"`
+	Distance   float64      `json:"dist"`
 	FinishTime string       `json:"finish"`
 }

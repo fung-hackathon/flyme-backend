@@ -33,6 +33,7 @@ type StartHistory struct {
 type FinishHistory struct {
 	Coords     []Coordinate
 	UserID     string
+	Distance   float64
 	FinishTime string
 }
 
