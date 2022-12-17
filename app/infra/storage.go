@@ -3,6 +3,7 @@ package infra
 import (
 	"context"
 	"errors"
+	"flyme-backend/app/logger"
 	"io"
 	"time"
 
@@ -22,13 +23,25 @@ type BucketRepository struct {
 func NewBucket(ctx context.Context, app *firebase.App) (*BucketRepository, error) {
 	client, err := app.Storage(context.Background())
 	if err != nil {
+		logger.Log{
+			Message: "failed to create new Firestorage client",
+			Cause:   err,
+		}.Err()
 		return nil, err
 	}
 
 	bucket, err := client.DefaultBucket()
 	if err != nil {
+		logger.Log{
+			Message: "failed to create new Bucket",
+			Cause:   err,
+		}.Err()
 		return nil, err
 	}
+
+	logger.Log{
+		Message: "created new Bucket",
+	}.Info()
 
 	return &BucketRepository{bucket}, nil
 }
@@ -54,6 +67,10 @@ func (r *BucketRepository) UploadIconImg(file io.Reader, userID string) error {
 		return err
 	}
 
+	logger.Log{
+		Message: "uploaded new icon to Firestorage",
+	}.Info()
+
 	return nil
 }
 
@@ -66,7 +83,13 @@ func (r *BucketRepository) DownloadIconImg(file io.Writer, userID string) error 
 		return err
 	}
 
-	io.Copy(file, rc)
+	if _, err := io.Copy(file, rc); err != nil {
+		return err
+	}
+
+	logger.Log{
+		Message: "downloaded new icon from Firestorage",
+	}.Info()
 
 	return nil
 }
