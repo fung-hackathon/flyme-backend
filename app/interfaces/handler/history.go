@@ -3,6 +3,7 @@ package handler
 import (
 	"flyme-backend/app/interfaces/request"
 	"flyme-backend/app/interfaces/response"
+	"flyme-backend/app/packages/auth"
 	"flyme-backend/app/usecase"
 	"net/http"
 	"strconv"
@@ -23,6 +24,18 @@ func NewHistoryHandler(u *usecase.HistoryUseCase) *HistoryHandler {
 func (h *HistoryHandler) StartHistory(c echo.Context) error {
 	userID := c.Param("user_id")
 
+	claims, err := auth.GetUserContext(c.Get("user"))
+
+	if err != nil || claims.UserID != userID {
+		return c.JSON(
+			http.StatusUnauthorized,
+			response.Error{
+				Code:    http.StatusUnauthorized,
+				Message: err.Error(),
+			},
+		)
+	}
+
 	var req request.StartHistoryRequest
 
 	if err := c.Bind(&req); err != nil {
@@ -38,9 +51,9 @@ func (h *HistoryHandler) StartHistory(c echo.Context) error {
 	history, err := h.historyUseCase.StartHistory(userID, &req)
 	if err != nil {
 		return c.JSON(
-			http.StatusNotFound,
+			http.StatusInternalServerError,
 			response.Error{
-				Code:    http.StatusNotFound,
+				Code:    http.StatusInternalServerError,
 				Message: err.Error(),
 			},
 		)
@@ -52,8 +65,19 @@ func (h *HistoryHandler) StartHistory(c echo.Context) error {
 func (h *HistoryHandler) FinishHistory(c echo.Context) error {
 	userID := c.Param("user_id")
 
-	var req request.FinishHistoryRequest
+	claims, err := auth.GetUserContext(c.Get("user"))
 
+	if err != nil || claims.UserID != userID {
+		return c.JSON(
+			http.StatusUnauthorized,
+			response.Error{
+				Code:    http.StatusUnauthorized,
+				Message: err.Error(),
+			},
+		)
+	}
+
+	var req request.FinishHistoryRequest
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(
 			http.StatusBadRequest,
@@ -67,9 +91,9 @@ func (h *HistoryHandler) FinishHistory(c echo.Context) error {
 	history, err := h.historyUseCase.FinishHistory(userID, &req)
 	if err != nil {
 		return c.JSON(
-			http.StatusNotFound,
+			http.StatusInternalServerError,
 			response.Error{
-				Code:    http.StatusNotFound,
+				Code:    http.StatusInternalServerError,
 				Message: err.Error(),
 			},
 		)
@@ -79,7 +103,21 @@ func (h *HistoryHandler) FinishHistory(c echo.Context) error {
 }
 
 func (h *HistoryHandler) ReadHistories(c echo.Context) error {
+
 	userID := c.Param("user_id")
+
+	claims, err := auth.GetUserContext(c.Get("user"))
+
+	if err != nil || claims.UserID != userID {
+		return c.JSON(
+			http.StatusUnauthorized,
+			response.Error{
+				Code:    http.StatusUnauthorized,
+				Message: err.Error(),
+			},
+		)
+	}
+
 	size, err := strconv.ParseInt(c.QueryParam("number"), 10, 32)
 
 	if err != nil {
@@ -108,6 +146,19 @@ func (h *HistoryHandler) ReadHistories(c echo.Context) error {
 
 func (h *HistoryHandler) ReadTimeline(c echo.Context) error {
 	userID := c.Param("user_id")
+
+	claims, err := auth.GetUserContext(c.Get("user"))
+
+	if err != nil || claims.UserID != userID {
+		return c.JSON(
+			http.StatusUnauthorized,
+			response.Error{
+				Code:    http.StatusUnauthorized,
+				Message: err.Error(),
+			},
+		)
+	}
+
 	size, err := strconv.ParseInt(c.QueryParam("number"), 10, 32)
 
 	if err != nil {

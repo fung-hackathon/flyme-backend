@@ -69,7 +69,7 @@ func (u *HistoryUseCase) FinishHistory(userID string, req *request.FinishHistory
 		return nil, err
 	}
 
-	rcoords := make([]response.Coordinate, len(history.Coords))
+	rcoords := make([]response.Coordinate, len(req.Coords))
 
 	for i, c := range history.Coords {
 		rcoords[i] = response.Coordinate{
@@ -90,6 +90,7 @@ func (u *HistoryUseCase) FinishHistory(userID string, req *request.FinishHistory
 }
 
 func (u *HistoryUseCase) ReadHistories(userID string, size int) (*response.ReadHistoriesResponse, error) {
+
 	histories, err := u.dbRepository.GetHistories(userID, size)
 	if err != nil {
 		return nil, err

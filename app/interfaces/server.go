@@ -79,10 +79,12 @@ func (s *Server) StartServer() {
 	s.Router.POST("/user", userHandler.CreateUser)
 	s.Router.POST("/login", userHandler.Login)
 	s.Router.GET("/user/:user_id", userHandler.ReadUser)
-	s.Router.PUT("/user/:user_id", userHandler.UpdateUser)
 
-	s.Router.GET("/user/:user_id", userHandler.ReadUser)
-	s.Router.PUT("/user/:user_id", userHandler.UpdateUser)
+	ur := s.Router.Group("")
+	{
+		ur.Use(middleware.Authentication("user"))
+		ur.PUT("/user/:user_id", userHandler.UpdateUser)
+	}
 
 	s.Router.POST("/icon/:user_id", imgHandler.UploadIcon)
 	s.Router.GET("/icon/:user_id", imgHandler.DownloadIcon)
@@ -101,22 +103,9 @@ func (s *Server) StartServer() {
 
 		hr.POST("/:user_id/start", historyHandler.StartHistory)
 		hr.POST("/:user_id/finish", historyHandler.FinishHistory)
+		hr.GET("/:user_id", historyHandler.ReadHistories)
 		hr.GET("/:user_id/timeline", historyHandler.ReadTimeline)
 	}
-	/*
-		// authorized '/ping' ---
-		r := s.Router.Group("/auth")
-		{
-			const contextKey = "user"
-			r.Use(middleware.Authentication(contextKey))
-
-			r.GET("/ping", func(c echo.Context) error {
-				ctx, _ := auth.GetUserContext(c.Get(contextKey))
-				return c.String(http.StatusOK, "pong by "+ctx.UserID)
-			})
-		}
-		// ---
-	*/
 
 	if config.MODE == config.Production {
 		s.Router.HideBanner = true
