@@ -3,6 +3,7 @@ package infra
 import (
 	"errors"
 	"flyme-backend/app/domain/entity"
+	"flyme-backend/app/logger"
 	"sort"
 
 	"cloud.google.com/go/firestore"
@@ -169,6 +170,10 @@ func (r *DBRepository) FinishHistory(history *entity.FinishHistory) (*entity.His
 		if err != nil {
 			return nil, err
 		}
+
+		logger.Log{
+			Message: "got user info from Firestore",
+		}.Info()
 	}
 
 	historyID := user.HistoryIDInProgress
@@ -211,6 +216,9 @@ func (r *DBRepository) FinishHistory(history *entity.FinishHistory) (*entity.His
 		if err != nil {
 			return nil, err
 		}
+		logger.Log{
+			Message: "updated history data",
+		}.Info()
 	}
 
 	// userのhistoryIDInProgressの更新
@@ -223,6 +231,10 @@ func (r *DBRepository) FinishHistory(history *entity.FinishHistory) (*entity.His
 		if err != nil {
 			return nil, err
 		}
+
+		logger.Log{
+			Message: "updated historyIDInProgress",
+		}.Info()
 	}
 
 	// 全followersのTLを更新
@@ -238,6 +250,9 @@ func (r *DBRepository) FinishHistory(history *entity.FinishHistory) (*entity.His
 				return nil, err
 			}
 		}
+		logger.Log{
+			Message: "updated followers' timeline",
+		}.Info()
 	}
 
 	// 以下, 更新したhistoryをGetして返す

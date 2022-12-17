@@ -2,6 +2,7 @@ package handler
 
 import (
 	"flyme-backend/app/interfaces/response"
+	"flyme-backend/app/logger"
 	"flyme-backend/app/packages/auth"
 	"flyme-backend/app/usecase"
 	"net/http"
@@ -26,6 +27,10 @@ func (h *FollowHandler) ListFollower(c echo.Context) error {
 	claims, err := auth.GetUserContext(c.Get("user"))
 
 	if err != nil {
+		logger.Log{
+			Message: "failed to get userID from auth info",
+			Cause:   err,
+		}.Warn()
 		return c.JSON(
 			http.StatusUnauthorized,
 			response.Error{
@@ -47,6 +52,10 @@ func (h *FollowHandler) ListFollower(c echo.Context) error {
 
 	followers, err := h.followUseCase.ListFollower(userID)
 	if err != nil {
+		logger.Log{
+			Message: "failed to get follower list",
+			Cause:   err,
+		}.Warn()
 		return c.JSON(
 			http.StatusNotFound,
 			response.Error{
@@ -80,6 +89,10 @@ func (h *FollowHandler) SendFollow(c echo.Context) error {
 	claims, err := auth.GetUserContext(c.Get("user"))
 
 	if err != nil {
+		logger.Log{
+			Message: "failed to send follow",
+			Cause:   err,
+		}.Warn()
 		return c.JSON(
 			http.StatusBadRequest,
 			response.Error{
@@ -103,6 +116,10 @@ func (h *FollowHandler) SendFollow(c echo.Context) error {
 
 	user, err := h.followUseCase.SendFollow(followeeUserID, followerUserID)
 	if err != nil {
+		logger.Log{
+			Message: "failed to send follow",
+			Cause:   err,
+		}.Warn()
 		return c.JSON(
 			http.StatusNotFound,
 			response.Error{

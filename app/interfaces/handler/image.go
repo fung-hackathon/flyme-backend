@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"flyme-backend/app/interfaces/response"
+	"flyme-backend/app/logger"
 	"flyme-backend/app/usecase"
 
 	"github.com/labstack/echo/v4"
@@ -22,11 +23,19 @@ func (h *ImageHandler) UploadIcon(c echo.Context) error {
 
 	file, err := c.FormFile("icon")
 	if err != nil {
+		logger.Log{
+			Message: "unexpected icon header",
+			Cause:   err,
+		}.Err()
 		return c.JSON(http.StatusInternalServerError, response.Error{Code: 50, Message: err.Error()})
 	}
 
 	f, err := file.Open()
 	if err != nil {
+		logger.Log{
+			Message: "internal server error",
+			Cause:   err,
+		}.Err()
 		return c.JSON(http.StatusInternalServerError, response.Error{Code: 50, Message: err.Error()})
 	}
 	defer f.Close()
@@ -37,6 +46,10 @@ func (h *ImageHandler) UploadIcon(c echo.Context) error {
 
 	err = h.imageUseCase.UploadIconImg(f, userID)
 	if err != nil {
+		logger.Log{
+			Message: "upload icon image was failed",
+			Cause:   err,
+		}.Err()
 		return c.JSON(http.StatusInternalServerError, response.Error{Code: 50, Message: err.Error()})
 	}
 
@@ -55,6 +68,10 @@ func (h *ImageHandler) DownloadIcon(c echo.Context) error {
 
 	err := h.imageUseCase.DownloadIconImg(res.Writer, userID)
 	if err != nil {
+		logger.Log{
+			Message: "download icon image",
+			Cause:   err,
+		}.Err()
 		return c.JSON(http.StatusInternalServerError, response.Error{Code: 50, Message: err.Error()})
 	}
 

@@ -2,6 +2,7 @@ package logger
 
 import (
 	"flyme-backend/app/config"
+	"fmt"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -42,7 +43,8 @@ func EchoLogger() echo.MiddlewareFunc {
 
 		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
 			timestamp := time.Now()
-			sugar.Infow("request",
+			sugar.Infow(
+				fmt.Sprintf("response (%d) %s %s", v.Status, v.Method, v.URI),
 				"timestamp", timestamp,
 				"method", v.Method,
 				"status", v.Status,
@@ -57,7 +59,7 @@ func EchoLogger() echo.MiddlewareFunc {
 
 func (l Log) Info() {
 	timestamp := time.Now()
-	logMessage := string(l.Message) + ":" + l.Cause.Error()
+	logMessage := string(l.Message)
 	sugar.Infow(logMessage, "timestamp", timestamp, "message", l.Message, "cause", l.Cause)
 }
 
