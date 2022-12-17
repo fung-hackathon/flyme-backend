@@ -3,10 +3,21 @@ package usecase
 import (
 	"errors"
 	"flyme-backend/app/domain/entity"
+	"flyme-backend/app/domain/repository"
 	"flyme-backend/app/interfaces/request"
 	"flyme-backend/app/interfaces/response"
 	"flyme-backend/app/packages/auth"
 )
+
+type UserUseCase struct {
+	dbRepository repository.DBRepositoryImpl
+}
+
+func NewUserUseCase(r repository.DBRepositoryImpl) *UserUseCase {
+	return &UserUseCase{
+		dbRepository: r,
+	}
+}
 
 func (u *UserUseCase) ReadUser(userID string) (*response.ReadUserResponse, error) {
 	user, err := u.dbRepository.GetUser(userID)

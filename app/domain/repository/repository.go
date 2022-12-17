@@ -17,6 +17,7 @@ type DBRepositoryImpl interface {
 	StartHistory(*entity.StartHistory) (*entity.HistoryTable, error)
 	FinishHistory(*entity.FinishHistory) (*entity.HistoryTable, error)
 
+	GetHistories(string, int) (*entity.GetHistories, error)
 	GetTimeline(string, int) (*entity.GetTimeline, error)
 
 	CheckUserExist(userID string) (bool, error)

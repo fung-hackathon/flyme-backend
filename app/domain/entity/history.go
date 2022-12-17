@@ -3,8 +3,8 @@ package entity
 import "github.com/google/uuid"
 
 type Coordinate struct {
-	Longitude float64 `json:"lng"`
-	Latitude  float64 `json:"lat"`
+	Longitude float64 `json:"Longitude"`
+	Latitude  float64 `json:"Latitude"`
 }
 
 type HistoryTable struct {
@@ -18,6 +18,10 @@ type HistoryTable struct {
 }
 
 type GetHistory = HistoryTable
+
+type GetHistories struct {
+	Histories []GetHistory
+}
 
 type StartHistory struct {
 	UserID    string

@@ -23,6 +23,10 @@ type HistoryTimeline struct {
 type StartHistoryResponse = HistoryTable
 type FinishHistoryResponse = HistoryTable
 
+type ReadHistoriesResponse struct {
+	Histories []HistoryTable `json:"histories"`
+}
+
 type ReadTimelineResponse struct {
 	Histories []HistoryTimeline `json:"histories"`
 }

@@ -57,7 +57,7 @@ func (r *DBRepository) insertHistoryToTimeline(userID string, historyID string) 
 		return nil, err
 	}
 
-	timeline.Histories = append(timeline.Histories, historyID)
+	timeline.Histories, timeline.Histories[0] = append(timeline.Histories[:1], timeline.Histories[0:]...), historyID
 
 	info := []firestore.Update{
 		{Path: "histories", Value: timeline.Histories},

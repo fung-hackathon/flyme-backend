@@ -51,6 +51,12 @@ func (r *DBRepository) SendFollow(follow *entity.SendFollow) error {
 		return err
 	}
 
+	for _, uid := range followers.Followers {
+		if uid == follow.FolloweeUserID {
+			return nil
+		}
+	}
+
 	followers.Followers = append(followers.Followers, follow.FolloweeUserID)
 
 	data, err := entity.BindToJsonMap(&followers)

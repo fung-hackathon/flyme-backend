@@ -33,13 +33,7 @@ func (h *UserHandler) ReadUser(c echo.Context) error {
 		)
 	}
 
-	response := &response.ReadUserResponse{
-		UserID:   user.UserID,
-		UserName: user.UserName,
-		Icon:     user.Icon,
-	}
-
-	return c.JSON(http.StatusOK, response)
+	return c.JSON(http.StatusOK, user)
 }
 
 func (h *UserHandler) CreateUser(c echo.Context) error {

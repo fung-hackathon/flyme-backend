@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/json"
 	"errors"
+	"flyme-backend/app/config"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -16,10 +17,14 @@ type UserJwtClaims struct {
 var signingKey []byte
 
 func init() {
-	signingKey = make([]byte, 128)
-	_, err := rand.Read(signingKey)
-	if err != nil {
-		panic(err)
+	if config.MODE == config.Production {
+		signingKey = make([]byte, 128)
+		_, err := rand.Read(signingKey)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		signingKey = []byte("nannde")
 	}
 }
 
