@@ -444,6 +444,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/userID"
       summary: アカウント画像を登録
+      security:
+        - Bearer: []
       responses:
         200:
           description: 移動履歴を返却
