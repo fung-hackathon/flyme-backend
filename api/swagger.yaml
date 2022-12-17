@@ -7,6 +7,8 @@ servers:
   - url: http://localhost:8080/
 
 tags:
+  - name: Health
+    description: Health API
   - name: User
     description: User関連API
   - name: Follow
@@ -19,6 +21,8 @@ tags:
 paths:
   /ping:
     get:
+      tags:
+        - Health
       summary: 死活管理用
       responses:
         200:
