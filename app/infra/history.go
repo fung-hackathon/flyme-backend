@@ -64,7 +64,9 @@ func (r *DBRepository) GetHistories(userID string, size int) (*entity.GetHistori
 		return histories[i].Start > histories[j].Start
 	})
 
-	histories = histories[:size]
+	if len(histories) >= size {
+		histories = histories[:size]
+	}
 
 	return &entity.GetHistories{
 		Histories: histories,
@@ -144,8 +146,6 @@ func (r *DBRepository) StartHistory(history *entity.StartHistory) (*entity.Histo
 
 func (r *DBRepository) FinishHistory(history *entity.FinishHistory) (*entity.HistoryTable, error) {
 
-	var user entity.GetUser
-
 	// userのドキュメントを保持
 	userDoc := r.Client.Collection("users").Doc(history.UserID)
 
@@ -158,6 +158,7 @@ func (r *DBRepository) FinishHistory(history *entity.FinishHistory) (*entity.His
 	}
 
 	// user情報の取得
+	var user entity.GetUser
 	{
 		docSnap, err := userDoc.Get(r.Context)
 		if err != nil {

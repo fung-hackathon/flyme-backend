@@ -5,6 +5,7 @@ import (
 
 	"flyme-backend/app/interfaces/request"
 	"flyme-backend/app/interfaces/response"
+	"flyme-backend/app/packages/auth"
 	"flyme-backend/app/usecase"
 
 	"github.com/labstack/echo/v4"
@@ -33,7 +34,13 @@ func (h *UserHandler) ReadUser(c echo.Context) error {
 		)
 	}
 
-	return c.JSON(http.StatusOK, user)
+	response := &response.ReadUserResponse{
+		UserID:   user.UserID,
+		UserName: user.UserName,
+		Icon:     user.Icon,
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *UserHandler) CreateUser(c echo.Context) error {
@@ -50,7 +57,7 @@ func (h *UserHandler) CreateUser(c echo.Context) error {
 		)
 	}
 
-	user, err := h.userUseCase.CreateUser(&req)
+	query, err := h.userUseCase.CreateUser(&req)
 	if err != nil {
 		return c.JSON(
 			http.StatusNotFound,
@@ -61,10 +68,10 @@ func (h *UserHandler) CreateUser(c echo.Context) error {
 		)
 	}
 
-	response := &response.ReadUserResponse{
-		UserID:   user.UserID,
-		UserName: user.UserName,
-		Icon:     user.Icon,
+	response := &response.CreateUserResponse{
+		UserID:   query.UserID,
+		UserName: query.UserName,
+		Icon:     query.Icon,
 	}
 
 	return c.JSON(http.StatusOK, response)
@@ -73,6 +80,28 @@ func (h *UserHandler) CreateUser(c echo.Context) error {
 func (h *UserHandler) UpdateUser(c echo.Context) error {
 
 	userID := c.Param("user_id")
+
+	claims, err := auth.GetUserContext(c.Get("user"))
+
+	if err != nil {
+		return c.JSON(
+			http.StatusUnauthorized,
+			response.Error{
+				Code:    http.StatusUnauthorized,
+				Message: err.Error(),
+			},
+		)
+	}
+
+	if claims.UserID != userID {
+		return c.JSON(
+			http.StatusUnauthorized,
+			response.Error{
+				Code:    http.StatusUnauthorized,
+				Message: "not authorized",
+			},
+		)
+	}
 
 	var req request.UpdateUserRequest
 
@@ -120,7 +149,7 @@ func (h *UserHandler) Login(c echo.Context) error {
 		)
 	}
 
-	info, err := h.userUseCase.Login(&req)
+	token, err := h.userUseCase.Login(&req)
 	if err != nil {
 		return c.JSON(
 			http.StatusNotFound,
@@ -132,7 +161,7 @@ func (h *UserHandler) Login(c echo.Context) error {
 	}
 
 	response := &response.LoginResponse{
-		Token: info.Token,
+		Token: token,
 	}
 
 	return c.JSON(http.StatusOK, response)

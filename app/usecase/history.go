@@ -4,7 +4,6 @@ import (
 	"flyme-backend/app/domain/entity"
 	"flyme-backend/app/domain/repository"
 	"flyme-backend/app/interfaces/request"
-	"flyme-backend/app/interfaces/response"
 )
 
 type HistoryUseCase struct {
@@ -17,7 +16,7 @@ func NewHistoryUseCase(r repository.DBRepositoryImpl) *HistoryUseCase {
 	}
 }
 
-func (u *HistoryUseCase) StartHistory(userID string, req *request.StartHistoryRequest) (*response.StartHistoryResponse, error) {
+func (u *HistoryUseCase) StartHistory(userID string, req *request.StartHistoryRequest) (*entity.HistoryTable, error) {
 
 	history, err := u.dbRepository.StartHistory(&entity.StartHistory{
 		UserID:    userID,
@@ -28,27 +27,10 @@ func (u *HistoryUseCase) StartHistory(userID string, req *request.StartHistoryRe
 		return nil, err
 	}
 
-	rcoords := make([]response.Coordinate, len(history.Coords))
-
-	for i, c := range history.Coords {
-		rcoords[i] = response.Coordinate{
-			Longitude: c.Longitude,
-			Latitude:  c.Latitude,
-		}
-	}
-
-	res := &response.StartHistoryResponse{
-		Coords: rcoords,
-		Dist:   history.Dist,
-		Finish: history.Finish,
-		Start:  history.Start,
-		State:  history.State,
-	}
-
-	return res, nil
+	return history, nil
 }
 
-func (u *HistoryUseCase) FinishHistory(userID string, req *request.FinishHistoryRequest) (*response.FinishHistoryResponse, error) {
+func (u *HistoryUseCase) FinishHistory(userID string, req *request.FinishHistoryRequest) (*entity.HistoryTable, error) {
 
 	hcoords := make([]entity.Coordinate, len(req.Coords))
 
@@ -69,97 +51,44 @@ func (u *HistoryUseCase) FinishHistory(userID string, req *request.FinishHistory
 		return nil, err
 	}
 
-	rcoords := make([]response.Coordinate, len(req.Coords))
-
-	for i, c := range history.Coords {
-		rcoords[i] = response.Coordinate{
-			Longitude: c.Longitude,
-			Latitude:  c.Latitude,
-		}
-	}
-
-	res := &response.FinishHistoryResponse{
-		Coords: rcoords,
-		Dist:   history.Dist,
-		Finish: history.Finish,
-		Start:  history.Start,
-		State:  history.State,
-	}
-
-	return res, nil
+	return history, nil
 }
 
-func (u *HistoryUseCase) ReadHistories(userID string, size int) (*response.ReadHistoriesResponse, error) {
+func (u *HistoryUseCase) ReadHistories(userID string, size int) (*entity.GetHistories, error) {
 
 	histories, err := u.dbRepository.GetHistories(userID, size)
 	if err != nil {
 		return nil, err
 	}
 
-	rtimeline := make([]response.HistoryTable, size)
-
-	for i, history := range histories.Histories {
-
-		rcoords := make([]response.Coordinate, len(history.Coords))
-
-		for i, c := range history.Coords {
-			rcoords[i] = response.Coordinate{
-				Longitude: c.Longitude,
-				Latitude:  c.Latitude,
-			}
-		}
-
-		rtimeline[i] = response.HistoryTable{
-			Coords: rcoords,
-			Dist:   history.Dist,
-			Finish: history.Finish,
-			Start:  history.Start,
-			State:  history.Start,
-		}
-	}
-
-	res := &response.ReadHistoriesResponse{
-		Histories: rtimeline,
-	}
-
-	return res, nil
+	return histories, nil
 }
 
-func (u *HistoryUseCase) ReadTimeline(userID string, size int) (*response.ReadTimelineResponse, error) {
+func (u *HistoryUseCase) ReadTimeline(userID string, size int) ([]*entity.GetHistory, []*entity.GetUser, error) {
 	timeline, err := u.dbRepository.GetTimeline(userID, size)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	rtimeline := make([]response.HistoryTimeline, size)
+	histories := make([]*entity.GetHistory, size)
+	users := make([]*entity.GetUser, size)
 
 	for i, hid := range timeline.Histories {
 
 		history, err := u.dbRepository.GetHistory(hid)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
+
+		histories[i] = history
 
 		user, err := u.dbRepository.GetUser(history.UserID)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
-		rtimeline[i] = response.HistoryTimeline{
-			User: response.UserInfo{
-				UserID:   user.UserID,
-				UserName: user.UserName,
-				Icon:     user.Icon,
-			},
-			Finish: history.Finish,
-			Start:  history.Start,
-			State:  history.State,
-		}
+		users[i] = user
 	}
 
-	res := &response.ReadTimelineResponse{
-		Histories: rtimeline,
-	}
-
-	return res, nil
+	return histories, users, nil
 }
