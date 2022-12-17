@@ -5,6 +5,7 @@ import (
 
 	"flyme-backend/app/interfaces/request"
 	"flyme-backend/app/interfaces/response"
+	"flyme-backend/app/logger"
 	"flyme-backend/app/packages/auth"
 	"flyme-backend/app/usecase"
 
@@ -25,6 +26,10 @@ func (h *UserHandler) ReadUser(c echo.Context) error {
 	userID := c.Param("user_id")
 	user, err := h.userUseCase.ReadUser(userID)
 	if err != nil {
+		logger.Log{
+			Message: "read user was failed",
+			Cause:   err,
+		}.Warn()
 		return c.JSON(
 			http.StatusNotFound,
 			response.Error{
@@ -48,6 +53,10 @@ func (h *UserHandler) CreateUser(c echo.Context) error {
 	var req request.CreateUserRequest
 
 	if err := c.Bind(&req); err != nil {
+		logger.Log{
+			Message: "unexpected request body",
+			Cause:   err,
+		}.Warn()
 		return c.JSON(
 			http.StatusBadRequest,
 			response.Error{
@@ -59,6 +68,10 @@ func (h *UserHandler) CreateUser(c echo.Context) error {
 
 	query, err := h.userUseCase.CreateUser(&req)
 	if err != nil {
+		logger.Log{
+			Message: "create user was failed",
+			Cause:   err,
+		}.Warn()
 		return c.JSON(
 			http.StatusNotFound,
 			response.Error{
@@ -84,6 +97,10 @@ func (h *UserHandler) UpdateUser(c echo.Context) error {
 	claims, err := auth.GetUserContext(c.Get("user"))
 
 	if err != nil {
+		logger.Log{
+			Message: "auth was failed",
+			Cause:   err,
+		}.Warn()
 		return c.JSON(
 			http.StatusUnauthorized,
 			response.Error{
@@ -106,6 +123,10 @@ func (h *UserHandler) UpdateUser(c echo.Context) error {
 	var req request.UpdateUserRequest
 
 	if err := c.Bind(&req); err != nil {
+		logger.Log{
+			Message: "unexpected request body",
+			Cause:   err,
+		}.Warn()
 		return c.JSON(
 			http.StatusBadRequest,
 			response.Error{
@@ -117,6 +138,10 @@ func (h *UserHandler) UpdateUser(c echo.Context) error {
 
 	user, err := h.userUseCase.UpdateUser(userID, &req)
 	if err != nil {
+		logger.Log{
+			Message: "update user was failed",
+			Cause:   err,
+		}.Err()
 		return c.JSON(
 			http.StatusNotFound,
 			response.Error{
@@ -140,6 +165,10 @@ func (h *UserHandler) Login(c echo.Context) error {
 	var req request.LoginRequest
 
 	if err := c.Bind(&req); err != nil {
+		logger.Log{
+			Message: "unexpected request body",
+			Cause:   err,
+		}.Warn()
 		return c.JSON(
 			http.StatusBadRequest,
 			response.Error{
@@ -151,6 +180,10 @@ func (h *UserHandler) Login(c echo.Context) error {
 
 	token, err := h.userUseCase.Login(&req)
 	if err != nil {
+		logger.Log{
+			Message: "unexpected request body",
+			Cause:   err,
+		}.Warn()
 		return c.JSON(
 			http.StatusNotFound,
 			response.Error{

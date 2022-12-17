@@ -2,6 +2,7 @@ package infra
 
 import (
 	"flyme-backend/app/domain/entity"
+	"flyme-backend/app/logger"
 
 	"cloud.google.com/go/firestore"
 )
@@ -63,6 +64,9 @@ func (r *DBRepository) InsertUser(user *entity.InsertUser) error {
 		if err != nil {
 			return err
 		}
+		logger.Log{
+			Message: "user modified",
+		}.Info()
 	}
 
 	// follower欄を追加
@@ -82,6 +86,9 @@ func (r *DBRepository) InsertUser(user *entity.InsertUser) error {
 		if err != nil {
 			return err
 		}
+		logger.Log{
+			Message: "follower modified",
+		}.Info()
 	}
 
 	// timeline欄を追加
@@ -101,6 +108,9 @@ func (r *DBRepository) InsertUser(user *entity.InsertUser) error {
 		if err != nil {
 			return err
 		}
+		logger.Log{
+			Message: "timeline modified",
+		}.Info()
 	}
 
 	return nil
