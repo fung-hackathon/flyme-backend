@@ -147,31 +147,31 @@ paths:
             "application/json":
               schema:
                 $ref: "#/components/schemas/Error"
-    delete:
-      tags:
-        - User
-      summary: Userの更新
-      parameters:
-        - $ref: "#/components/parameters/userID"
-      responses:
-        200:
-          description: User情報
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/User"
-        400:
-          description: ユーザからの入力おかしい
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/Error"
-        500:
-          description: サーバ側のエラー
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/Error"
+    # delete:
+    #   tags:
+    #     - User
+    #   summary: Userの更新
+    #   parameters:
+    #     - $ref: "#/components/parameters/userID"
+    #   responses:
+    #     200:
+    #       description: User情報
+    #       content:
+    #         "application/json":
+    #           schema:
+    #             $ref: "#/components/schemas/User"
+    #     400:
+    #       description: ユーザからの入力おかしい
+    #       content:
+    #         "application/json":
+    #           schema:
+    #             $ref: "#/components/schemas/Error"
+    #     500:
+    #       description: サーバ側のエラー
+    #       content:
+    #         "application/json":
+    #           schema:
+    #             $ref: "#/components/schemas/Error"
 
   /follow/{userID}:
     get:
