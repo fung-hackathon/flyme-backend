@@ -447,6 +447,15 @@ paths:
         - Icon
       parameters:
         - $ref: "#/components/parameters/userID"
+        - name: icon
+          in: header
+          required: true
+          description: アイコン画像
+          content:
+            "image/png":
+              schema:
+                type: string
+                format: binary
       summary: アカウント画像を登録
       security:
         - Bearer: []
