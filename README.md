@@ -21,7 +21,7 @@ $ PORT=xxx \
 `BUCKET_ID`: Firebase Storageアクセス用のID<br>
 `MODE`: 実行モード
 
-### クレジット
+<!-- ### クレジット
 
 **YOLP**<br>
-[Webサービス by Yahoo! JAPAN](https://developer.yahoo.co.jp/sitemap/)
+[Webサービス by Yahoo! JAPAN](https://developer.yahoo.co.jp/sitemap/) -->
