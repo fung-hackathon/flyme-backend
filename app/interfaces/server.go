@@ -84,10 +84,9 @@ func (s *Server) StartServer() {
 	{
 		ur.Use(middleware.Authentication("user"))
 		ur.PUT("/user/:user_id", userHandler.UpdateUser)
+		ur.POST("/icon/:user_id", imgHandler.UploadIcon)
+		ur.GET("/icon/:user_id", imgHandler.DownloadIcon)
 	}
-
-	s.Router.POST("/icon/:user_id", imgHandler.UploadIcon)
-	s.Router.GET("/icon/:user_id", imgHandler.DownloadIcon)
 
 	fr := s.Router.Group("/follow")
 	{

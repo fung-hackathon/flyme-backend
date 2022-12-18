@@ -11,6 +11,7 @@ type HistoryTable struct {
 	Finish string       `json:"finish"`
 	Start  string       `json:"start"`
 	State  string       `json:"state"`
+	Ticket string       `json:"ticket"`
 }
 
 type HistoryTimeline struct {
@@ -18,6 +19,7 @@ type HistoryTimeline struct {
 	Finish string   `json:"finish"`
 	Start  string   `json:"start"`
 	State  string   `json:"state"`
+	Ticket string   `json:"ticket"`
 }
 
 type StartHistoryResponse = HistoryTable

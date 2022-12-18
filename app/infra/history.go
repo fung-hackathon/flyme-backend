@@ -3,7 +3,7 @@ package infra
 import (
 	"errors"
 	"flyme-backend/app/domain/entity"
-	"flyme-backend/app/packages/geo"
+	"flyme-backend/app/logger"
 	"sort"
 
 	"cloud.google.com/go/firestore"
@@ -82,6 +82,7 @@ func (r *DBRepository) StartHistory(history *entity.StartHistory) (*entity.Histo
 		Finish:    "",
 		Start:     history.StartTime,
 		State:     "start",
+		Ticket:    history.Ticket,
 		UserID:    history.UserID,
 		HistoryID: historyID,
 	}
@@ -169,6 +170,10 @@ func (r *DBRepository) FinishHistory(history *entity.FinishHistory) (*entity.His
 		if err != nil {
 			return nil, err
 		}
+
+		logger.Log{
+			Message: "got user info from Firestore",
+		}.Info()
 	}
 
 	historyID := user.HistoryIDInProgress
@@ -177,27 +182,13 @@ func (r *DBRepository) FinishHistory(history *entity.FinishHistory) (*entity.His
 		return nil, errors.New("unknown history")
 	}
 
-	geoCoords := make([]geo.Coordinate, len(history.Coords))
-	for i, c := range history.Coords {
-		geoCoords[i] = geo.Coordinate{
-			Longitude: c.Longitude,
-			Latitude:  c.Latitude,
-		}
-	}
-
-	// 総距離を計測
-	dist, err := geo.GetDistanceKm(geoCoords)
-	if err != nil {
-		return nil, err
-	}
-
 	// historyのドキュメントを保持
 	historiesDoc := r.Client.Collection("histories").Doc(historyID)
 
 	// 更新情報を一旦取りまとめる
 	historyTable := entity.HistoryTable{
 		Coords:    history.Coords,
-		Dist:      dist,
+		Dist:      history.Distance,
 		Finish:    history.FinishTime,
 		State:     "finish",
 		UserID:    history.UserID,
@@ -225,6 +216,9 @@ func (r *DBRepository) FinishHistory(history *entity.FinishHistory) (*entity.His
 		if err != nil {
 			return nil, err
 		}
+		logger.Log{
+			Message: "updated history data",
+		}.Info()
 	}
 
 	// userのhistoryIDInProgressの更新
@@ -237,6 +231,10 @@ func (r *DBRepository) FinishHistory(history *entity.FinishHistory) (*entity.His
 		if err != nil {
 			return nil, err
 		}
+
+		logger.Log{
+			Message: "updated historyIDInProgress",
+		}.Info()
 	}
 
 	// 全followersのTLを更新
@@ -252,6 +250,9 @@ func (r *DBRepository) FinishHistory(history *entity.FinishHistory) (*entity.His
 				return nil, err
 			}
 		}
+		logger.Log{
+			Message: "updated followers' timeline",
+		}.Info()
 	}
 
 	// 以下, 更新したhistoryをGetして返す

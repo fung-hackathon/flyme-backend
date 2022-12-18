@@ -20,6 +20,7 @@ func (u *HistoryUseCase) StartHistory(userID string, req *request.StartHistoryRe
 
 	history, err := u.dbRepository.StartHistory(&entity.StartHistory{
 		UserID:    userID,
+		Ticket:    req.Ticket,
 		StartTime: req.StartTime,
 	})
 
@@ -44,6 +45,7 @@ func (u *HistoryUseCase) FinishHistory(userID string, req *request.FinishHistory
 	history, err := u.dbRepository.FinishHistory(&entity.FinishHistory{
 		Coords:     hcoords,
 		UserID:     userID,
+		Distance:   req.Distance,
 		FinishTime: req.FinishTime,
 	})
 
@@ -70,24 +72,28 @@ func (u *HistoryUseCase) ReadTimeline(userID string, size int) ([]*entity.GetHis
 		return nil, nil, err
 	}
 
-	histories := make([]*entity.GetHistory, size)
-	users := make([]*entity.GetUser, size)
+	histories := []*entity.GetHistory{}
+	users := []*entity.GetUser{}
 
 	for i, hid := range timeline.Histories {
+
+		if i >= int(size) {
+			break
+		}
 
 		history, err := u.dbRepository.GetHistory(hid)
 		if err != nil {
 			return nil, nil, err
 		}
 
-		histories[i] = history
+		histories = append(histories, history)
 
 		user, err := u.dbRepository.GetUser(history.UserID)
 		if err != nil {
 			return nil, nil, err
 		}
 
-		users[i] = user
+		users = append(users, user)
 	}
 
 	return histories, users, nil

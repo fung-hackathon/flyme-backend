@@ -8,16 +8,22 @@ servers:
   - url: https://flyme-backend.onrender.com/
 
 tags:
+  - name: Health
+    description: Health API
   - name: User
     description: User関連API
   - name: Follow
     description: 友達API
   - name: History
     description: 移動履歴API
+  - name: Icon
+    description: Icon取得API
 
 paths:
   /ping:
     get:
+      tags:
+        - Health
       summary: 死活管理用
       responses:
         200:
@@ -146,31 +152,31 @@ paths:
             "application/json":
               schema:
                 $ref: "#/components/schemas/Error"
-    delete:
-      tags:
-        - User
-      summary: Userの更新
-      parameters:
-        - $ref: "#/components/parameters/userID"
-      responses:
-        200:
-          description: User情報
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/User"
-        400:
-          description: ユーザからの入力おかしい
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/Error"
-        500:
-          description: サーバ側のエラー
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/Error"
+    # delete:
+    #   tags:
+    #     - User
+    #   summary: Userの更新
+    #   parameters:
+    #     - $ref: "#/components/parameters/userID"
+    #   responses:
+    #     200:
+    #       description: User情報
+    #       content:
+    #         "application/json":
+    #           schema:
+    #             $ref: "#/components/schemas/User"
+    #     400:
+    #       description: ユーザからの入力おかしい
+    #       content:
+    #         "application/json":
+    #           schema:
+    #             $ref: "#/components/schemas/Error"
+    #     500:
+    #       description: サーバ側のエラー
+    #       content:
+    #         "application/json":
+    #           schema:
+    #             $ref: "#/components/schemas/Error"
 
   /follow/{userID}:
     get:
@@ -227,61 +233,61 @@ paths:
             "application/json":
               schema:
                 $ref: "#/components/schemas/Error"
-  /request/{userID}:
-    get:
-      tags:
-        - Follow
-      summary: フォロー申請されている人のリスト
-      security:
-        - Bearer: []
-      parameters:
-        - $ref: "#/components/parameters/userID"
-      responses:
-        200:
-          description: フォロワーのリスト
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/Requests"
-        400:
-          description: ユーザからの入力おかしい
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/Error"
-        500:
-          description: サーバ側のエラー
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/Error"
-    post:
-      tags:
-        - Follow
-      summary: フォロー申請を許可
-      security:
-        - Bearer: []
-      parameters:
-        - $ref: "#/components/parameters/userID"
-      responses:
-        200:
-          description: フォローリスト
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/User"
-        400:
-          description: ユーザからの入力おかしい
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/Error"
-        500:
-          description: サーバ側のエラー
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/Error"
+  # /request/{userID}:
+  #   get:
+  #     tags:
+  #       - Follow
+  #     summary: フォロー申請されている人のリスト
+  #     security:
+  #       - Bearer: []
+  #     parameters:
+  #       - $ref: "#/components/parameters/userID"
+  #     responses:
+  #       200:
+  #         description: フォロワーのリスト
+  #         content:
+  #           "application/json":
+  #             schema:
+  #               $ref: "#/components/schemas/Requests"
+  #       400:
+  #         description: ユーザからの入力おかしい
+  #         content:
+  #           "application/json":
+  #             schema:
+  #               $ref: "#/components/schemas/Error"
+  #       500:
+  #         description: サーバ側のエラー
+  #         content:
+  #           "application/json":
+  #             schema:
+  #               $ref: "#/components/schemas/Error"
+  #   post:
+  #     tags:
+  #       - Follow
+  #     summary: フォロー申請を許可
+  #     security:
+  #       - Bearer: []
+  #     parameters:
+  #       - $ref: "#/components/parameters/userID"
+  #     responses:
+  #       200:
+  #         description: フォローリスト
+  #         content:
+  #           "application/json":
+  #             schema:
+  #               $ref: "#/components/schemas/User"
+  #       400:
+  #         description: ユーザからの入力おかしい
+  #         content:
+  #           "application/json":
+  #             schema:
+  #               $ref: "#/components/schemas/Error"
+  #       500:
+  #         description: サーバ側のエラー
+  #         content:
+  #           "application/json":
+  #             schema:
+  #               $ref: "#/components/schemas/Error"
 
   /history/{userID}/start:
     post:
@@ -410,6 +416,73 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /icon/{userID}:
+    get:
+      tags:
+        - Icon
+      parameters:
+        - $ref: "#/components/parameters/userID"
+      summary: アカウント画像取得
+      responses:
+        200:
+          description: 移動履歴を返却
+          content:
+            "image/png":
+              schema:
+                type: string
+                format: binary
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      tags:
+        - Icon
+      parameters:
+        - $ref: "#/components/parameters/userID"
+        - name: icon
+          in: header
+          required: true
+          description: アイコン画像
+          content:
+            "image/png":
+              schema:
+                type: string
+                format: binary
+      summary: アカウント画像を登録
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: 移動履歴を返却
+          content:
+            "application/json":
+              schema:
+                properties:
+                  message:
+                    type: string
+                    example: uploaded
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+
 components:
   schemas:
     Error:
@@ -478,6 +551,9 @@ components:
         start:
           type: string
           example: 2006-01-02T15:04:05
+        ticket:
+          type: string
+          example: MOON
         finish:
           type: string
           example: 2006-01-02T15:04:05
@@ -504,12 +580,19 @@ components:
         start:
           type: string
           example: 2006-01-02T15:04:05
+        ticket:
+          type: string
+          example: MOON
     HistoryFinish:
       type: object
       properties:
         finish:
           type: string
           example: 2006-01-02T15:04:05
+        dist:
+          type: number
+          format: float
+          example: 33.4
         coordinates:
           type: array
           items:
@@ -538,6 +621,9 @@ components:
               start:
                 type: string
                 example: 2006-01-02T15:04:05
+              ticket:
+                type: string
+                example: MOON
               finish:
                 type: string
                 example: 2006-01-02T15:04:05

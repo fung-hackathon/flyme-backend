@@ -13,6 +13,7 @@ type HistoryTable struct {
 	Finish    string       `json:"finish"`
 	Start     string       `json:"start"`
 	State     string       `json:"state"`
+	Ticket    string       `json:"ticket"`
 	UserID    string       `json:"userID"`
 	HistoryID string       `json:"historyID"`
 }
@@ -26,11 +27,13 @@ type GetHistories struct {
 type StartHistory struct {
 	UserID    string
 	StartTime string
+	Ticket    string
 }
 
 type FinishHistory struct {
 	Coords     []Coordinate
 	UserID     string
+	Distance   float64
 	FinishTime string
 }
 

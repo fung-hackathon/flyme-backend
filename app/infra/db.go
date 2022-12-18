@@ -2,6 +2,7 @@ package infra
 
 import (
 	"context"
+	"flyme-backend/app/logger"
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go/v4"
@@ -17,9 +18,15 @@ type DBRepository struct {
 func NewDBRepository(ctx context.Context, app *firebase.App) (*DBRepository, error) {
 	client, err := app.Firestore(ctx)
 	if err != nil {
+		logger.Log{
+			Message: "failed to create connection to Firestore",
+			Cause:   err,
+		}.Err()
 		return nil, ErrFirestoreConnection
 	}
-
+	logger.Log{
+		Message: "created connection to Firestore",
+	}.Info()
 	return &DBRepository{Client: client, Context: ctx}, nil
 }
 

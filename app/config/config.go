@@ -46,11 +46,6 @@ func init() {
 		panic(err)
 	}
 
-	YOLP_APPID, err = getYOLP_APPID()
-	if err != nil {
-		panic(err)
-	}
-
 	MODE, err = getMODE()
 	if err != nil {
 		panic(err)
@@ -86,15 +81,6 @@ func getBUCKET_ID() (string, error) {
 
 func getGOOGLE_APPLICATION_CREDENTIALS() (string, error) {
 	key := "GOOGLE_APPLICATION_CREDENTIALS"
-	e := os.Getenv(key)
-	if e == "" {
-		return "", fmt.Errorf("the environment variable %s must be filled", key)
-	}
-	return e, nil
-}
-
-func getYOLP_APPID() (string, error) {
-	key := "YOLP_APPID"
 	e := os.Getenv(key)
 	if e == "" {
 		return "", fmt.Errorf("the environment variable %s must be filled", key)

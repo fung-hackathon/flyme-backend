@@ -3,6 +3,7 @@ package handler
 import (
 	"flyme-backend/app/interfaces/request"
 	"flyme-backend/app/interfaces/response"
+	"flyme-backend/app/logger"
 	"flyme-backend/app/packages/auth"
 	"flyme-backend/app/usecase"
 	"net/http"
@@ -27,6 +28,10 @@ func (h *HistoryHandler) StartHistory(c echo.Context) error {
 	claims, err := auth.GetUserContext(c.Get("user"))
 
 	if err != nil {
+		logger.Log{
+			Message: "failed to auth",
+			Cause:   err,
+		}.Warn()
 		return c.JSON(
 			http.StatusUnauthorized,
 			response.Error{
@@ -49,6 +54,10 @@ func (h *HistoryHandler) StartHistory(c echo.Context) error {
 	var req request.StartHistoryRequest
 
 	if err := c.Bind(&req); err != nil {
+		logger.Log{
+			Message: "unexpected request body",
+			Cause:   err,
+		}.Warn()
 		return c.JSON(
 			http.StatusBadRequest,
 			response.Error{
@@ -60,6 +69,10 @@ func (h *HistoryHandler) StartHistory(c echo.Context) error {
 
 	history, err := h.historyUseCase.StartHistory(userID, &req)
 	if err != nil {
+		logger.Log{
+			Message: "start history was failed",
+			Cause:   err,
+		}.Err()
 		return c.JSON(
 			http.StatusInternalServerError,
 			response.Error{
@@ -84,6 +97,7 @@ func (h *HistoryHandler) StartHistory(c echo.Context) error {
 		Finish: history.Finish,
 		Start:  history.Start,
 		State:  history.State,
+		Ticket: history.Ticket,
 	}
 
 	return c.JSON(http.StatusOK, response)
@@ -95,6 +109,10 @@ func (h *HistoryHandler) FinishHistory(c echo.Context) error {
 	claims, err := auth.GetUserContext(c.Get("user"))
 
 	if err != nil {
+		logger.Log{
+			Message: "failed to auth",
+			Cause:   err,
+		}.Warn()
 		return c.JSON(
 			http.StatusUnauthorized,
 			response.Error{
@@ -116,6 +134,10 @@ func (h *HistoryHandler) FinishHistory(c echo.Context) error {
 
 	var req request.FinishHistoryRequest
 	if err := c.Bind(&req); err != nil {
+		logger.Log{
+			Message: "unexpected request body",
+			Cause:   err,
+		}.Warn()
 		return c.JSON(
 			http.StatusBadRequest,
 			response.Error{
@@ -127,6 +149,10 @@ func (h *HistoryHandler) FinishHistory(c echo.Context) error {
 
 	history, err := h.historyUseCase.FinishHistory(userID, &req)
 	if err != nil {
+		logger.Log{
+			Message: "finish history was failed",
+			Cause:   err,
+		}.Err()
 		return c.JSON(
 			http.StatusInternalServerError,
 			response.Error{
@@ -151,6 +177,7 @@ func (h *HistoryHandler) FinishHistory(c echo.Context) error {
 		Finish: history.Finish,
 		Start:  history.Start,
 		State:  history.State,
+		Ticket: history.Ticket,
 	}
 
 	return c.JSON(http.StatusOK, response)
@@ -163,6 +190,10 @@ func (h *HistoryHandler) ReadHistories(c echo.Context) error {
 	claims, err := auth.GetUserContext(c.Get("user"))
 
 	if err != nil {
+		logger.Log{
+			Message: "auth was failed",
+			Cause:   err,
+		}.Warn()
 		return c.JSON(
 			http.StatusUnauthorized,
 			response.Error{
@@ -185,6 +216,10 @@ func (h *HistoryHandler) ReadHistories(c echo.Context) error {
 	size, err := strconv.ParseInt(c.QueryParam("number"), 10, 32)
 
 	if err != nil {
+		logger.Log{
+			Message: "unexpected query param",
+			Cause:   err,
+		}.Warn()
 		return c.JSON(
 			http.StatusBadRequest,
 			response.Error{
@@ -196,6 +231,10 @@ func (h *HistoryHandler) ReadHistories(c echo.Context) error {
 
 	histories, err := h.historyUseCase.ReadHistories(userID, int(size))
 	if err != nil {
+		logger.Log{
+			Message: "read histories was failed",
+			Cause:   err,
+		}.Warn()
 		return c.JSON(
 			http.StatusNotFound,
 			response.Error{
@@ -224,6 +263,7 @@ func (h *HistoryHandler) ReadHistories(c echo.Context) error {
 			Finish: history.Finish,
 			Start:  history.Start,
 			State:  history.Start,
+			Ticket: history.Ticket,
 		})
 	}
 
@@ -240,6 +280,10 @@ func (h *HistoryHandler) ReadTimeline(c echo.Context) error {
 	claims, err := auth.GetUserContext(c.Get("user"))
 
 	if err != nil {
+		logger.Log{
+			Message: "auth was failed",
+			Cause:   err,
+		}.Warn()
 		return c.JSON(
 			http.StatusUnauthorized,
 			response.Error{
@@ -262,6 +306,10 @@ func (h *HistoryHandler) ReadTimeline(c echo.Context) error {
 	size, err := strconv.ParseInt(c.QueryParam("number"), 10, 32)
 
 	if err != nil {
+		logger.Log{
+			Message: "unexpected query param",
+			Cause:   err,
+		}.Warn()
 		return c.JSON(
 			http.StatusBadRequest,
 			response.Error{
@@ -273,6 +321,10 @@ func (h *HistoryHandler) ReadTimeline(c echo.Context) error {
 
 	histories, users, err := h.historyUseCase.ReadTimeline(userID, int(size))
 	if err != nil {
+		logger.Log{
+			Message: "read timeline was failed",
+			Cause:   err,
+		}.Warn()
 		return c.JSON(
 			http.StatusNotFound,
 			response.Error{
@@ -284,8 +336,7 @@ func (h *HistoryHandler) ReadTimeline(c echo.Context) error {
 
 	timeline := []response.HistoryTimeline{}
 
-	for i := range timeline {
-
+	for i := range histories {
 		timeline = append(timeline, response.HistoryTimeline{
 			User: response.UserInfo{
 				UserID:   users[i].UserID,
@@ -295,6 +346,7 @@ func (h *HistoryHandler) ReadTimeline(c echo.Context) error {
 			Finish: histories[i].Finish,
 			Start:  histories[i].Start,
 			State:  histories[i].State,
+			Ticket: histories[i].Ticket,
 		})
 	}
 
