@@ -5,6 +5,7 @@ import (
 
 	"flyme-backend/app/interfaces/request"
 	"flyme-backend/app/interfaces/response"
+	"flyme-backend/app/logger"
 	"flyme-backend/app/packages/auth"
 	"flyme-backend/app/usecase"
 
@@ -148,6 +149,8 @@ func (h *UserHandler) Login(c echo.Context) error {
 			},
 		)
 	}
+
+	logger.RequestLog(req)
 
 	token, err := h.userUseCase.Login(&req)
 	if err != nil {

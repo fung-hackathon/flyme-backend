@@ -72,3 +72,7 @@ func (l Log) Err() {
 	logMessage := string(l.Message) + ":" + l.Cause.Error()
 	sugar.Errorw(logMessage, "timestamp", timestamp, "message", l.Message, "cause", l.Cause)
 }
+
+func RequestLog(s interface{}) {
+	sugar.Infow("requestLog", "request_body", s)
+}
