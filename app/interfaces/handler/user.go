@@ -178,6 +178,8 @@ func (h *UserHandler) Login(c echo.Context) error {
 		)
 	}
 
+	logger.RequestLog(req)
+
 	token, err := h.userUseCase.Login(&req)
 	if err != nil {
 		logger.Log{
