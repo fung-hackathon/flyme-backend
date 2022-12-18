@@ -5,6 +5,7 @@ info:
 
 servers:
   - url: http://localhost:8080/
+  - url: https://flyme-backend.onrender.com/
 
 tags:
   - name: Health
