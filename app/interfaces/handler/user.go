@@ -135,6 +135,32 @@ func (h *UserHandler) UpdateUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
+func (h *UserHandler) ValidateUserToken(c echo.Context) error {
+	var req request.ValidateUserTokenRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(
+			http.StatusBadRequest,
+			response.Error{
+				Code:    http.StatusBadRequest,
+				Message: err.Error(),
+			},
+		)
+	}
+
+	err := h.userUseCase.ValidateUserToken(&req)
+	if err != nil {
+		return c.JSON(
+			http.StatusForbidden,
+			response.Error{
+				Code:    http.StatusForbidden,
+				Message: err.Error(),
+			},
+		)
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
 func (h *UserHandler) Login(c echo.Context) error {
 
 	var req request.LoginRequest

@@ -1,10 +1,5 @@
 package request
 
-type LoginRequest struct {
-	UserID string `json:"userID"`
-	Passwd string `json:"passwd"`
-}
-
 type CreateUserRequest struct {
 	UserID   string `json:"userID"`
 	UserName string `json:"userName"`
@@ -14,4 +9,13 @@ type CreateUserRequest struct {
 type UpdateUserRequest struct {
 	UserName string `json:"userName"`
 	Icon     string `json:"icon"`
+}
+
+type LoginRequest struct {
+	UserID string `json:"userID"`
+	Passwd string `json:"passwd"`
+}
+
+type ValidateUserTokenRequest struct {
+	Token string `json:"token"`
 }

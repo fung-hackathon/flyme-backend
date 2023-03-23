@@ -81,3 +81,13 @@ func (u *UserUseCase) Login(req *request.LoginRequest) (string, error) {
 
 	return token, nil
 }
+
+func (u *UserUseCase) ValidateUserToken(req *request.ValidateUserTokenRequest) error {
+
+	_, err := auth.ValidateUserToken(req.Token)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
