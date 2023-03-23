@@ -190,7 +190,7 @@ paths:
       responses:
         200:
           description: トークンが有効
-          
+
         400:
           description: ユーザからの入力おかしい
           content:
@@ -683,14 +683,6 @@ components:
           type: string
           example: fun
         passwd:
-          type: string
-    RefreshToken:
-      type: object
-      properties:
-        userID:
-          type: string
-          example: fun
-        token:
           type: string
     Token:
       type: object
