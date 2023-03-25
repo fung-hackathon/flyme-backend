@@ -14,6 +14,8 @@ type UserJwtClaims struct {
 	UserID string `json:"userID"`
 }
 
+const TokenExpireTime = time.Hour * 24
+
 var signingKey []byte
 
 func init() {
@@ -32,10 +34,14 @@ func GenerateUserToken(userID string, passwd string) (string, error) {
 
 	token := jwt.New(jwt.SigningMethodHS256)
 
-	claims := token.Claims.(jwt.MapClaims)
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return "", errors.New("invalid claims")
+	}
+
 	claims["userID"] = userID
 	claims["iat"] = time.Now().Unix()
-	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+	claims["exp"] = time.Now().Add(TokenExpireTime).Unix()
 
 	tokenStr, err := token.SignedString(signingKey)
 	if err != nil {

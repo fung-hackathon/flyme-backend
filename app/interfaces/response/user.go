@@ -13,3 +13,7 @@ type UpdateUserResponse = UserInfo
 type LoginResponse struct {
 	Token string `json:"token"`
 }
+
+type ValidateUserTokenResponse struct {
+	Valid bool `json:"valid"`
+}

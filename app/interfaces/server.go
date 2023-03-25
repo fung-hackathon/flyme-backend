@@ -79,6 +79,7 @@ func (s *Server) StartServer() {
 	s.Router.POST("/user", userHandler.CreateUser)
 	s.Router.POST("/login", userHandler.Login)
 	s.Router.GET("/user/:user_id", userHandler.ReadUser)
+	s.Router.POST("/token/validate", userHandler.ValidateUserToken)
 
 	ur := s.Router.Group("")
 	{

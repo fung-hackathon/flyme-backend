@@ -64,36 +64,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /login:
-    post:
-      tags:
-        - User
-      summary: ログイン
-      requestBody:
-        content:
-          "application/json":
-            schema:
-              $ref: "#/components/schemas/Login"
-      responses:
-        200:
-          description: User情報
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/Token"
-        400:
-          description: ユーザからの入力おかしい
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/Error"
-        500:
-          description: サーバ側のエラー
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/Error"
-
   /user/{userID}:
     get:
       tags:
@@ -177,6 +147,69 @@ paths:
     #         "application/json":
     #           schema:
     #             $ref: "#/components/schemas/Error"
+
+  /login:
+    post:
+      tags:
+        - User
+      summary: ログイン
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/Login"
+      responses:
+        200:
+          description: User情報
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Token"
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+  
+  /token/validate:
+    post:
+      tags:
+        - User
+      summary: トークンが有効かどうかの確認
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/Token"
+      responses:
+        200:
+          description: トークンが有効
+
+        400:
+          description: ユーザからの入力おかしい
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: トークンの有効期限が切れている
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: サーバ側のエラー
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
 
   /follow/{userID}:
     get:
